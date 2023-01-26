@@ -22,32 +22,32 @@ Quick starting guide:
 
 - 📦 Export from Flomo
   1. Go to "Account Details"
-  <img src="./assets/export_from_flomo.jpg" width="80">
+  <img src="https://raw.githubusercontent.com/jia6y/flomo-to-obsidian/main/assets/export_from_flomo.jpg" width="80">
   
   2. Select "Export All (in HTML)"
-  <img src="./assets/export_from_flomo_2.jpg" width="180">
+  <img src="https://raw.githubusercontent.com/jia6y/flomo-to-obsidian/main/assets/export_from_flomo_2.jpg" width="180">
   
   3. Click on "Start to export"
-  <img src="./assets/export_from_flomo_3.jpg" width="180">
+  <img src="https://raw.githubusercontent.com/jia6y/flomo-to-obsidian/main/assets/export_from_flomo_3.jpg" width="180">
 
 - 🎉 Import to Obsidian
   1. Enable **Flomo Importer** plugin
-  <img src="./assets/enable.png" width="300">
+  <img src="https://raw.githubusercontent.com/jia6y/flomo-to-obsidian/main/assets/enable.png" width="300">
   
   2. Use command "Open Flomo Importer"
-  <img src="./assets/import_cmd_2.png" width="300">
+  <img src="https://raw.githubusercontent.com/jia6y/flomo-to-obsidian/main/assets/import_cmd_2.png" width="300">
   
   3. Alternatively, you can use the "Import Button"
-  <img src="./assets/import_btn_2.png" width="150">
+  <img src="https://raw.githubusercontent.com/jia6y/flomo-to-obsidian/main/assets/import_btn_2.png" width="150">
   
   4. Select Flomo Data File, then Import. By default all memos will be imported to "flomo" folder, you can modify the "Target location" to change it \
-  <img src="./assets/import_form.png" width="500">
+  <img src="https://raw.githubusercontent.com/jia6y/flomo-to-obsidian/main/assets/import_form.png" width="500">
   
   5. Once Import completed, you'll get a Notice.
-  <img src="./assets/notice.png" width="200">
+  <img src="https://raw.githubusercontent.com/jia6y/flomo-to-obsidian/main/assets/notice.png" width="200">
   
   6. Go to **Flmomo Moments**
-  <img src="./assets/moments_3.png" width="680">
+  <img src="https://raw.githubusercontent.com/jia6y/flomo-to-obsidian/main/assets/moments_3.png" width="680">
 
 <br />
 
@@ -58,4 +58,4 @@ Please feel free to reach out to me if there's any issue or questions. :)
 
 ## Buy me a coffee
 
-<img src="./assets/buy_me_a_coffee.jpeg" width="260">
+<img src="https://raw.githubusercontent.com/jia6y/flomo-to-obsidian/main/assets/buy_me_a_coffee.jpeg" width="260">
