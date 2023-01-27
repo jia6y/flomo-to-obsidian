@@ -18,15 +18,13 @@ Author: [Jialu Y](https://github.com/jia6y)
 
 ## First time to use it?
 
-Quick starting guide:
-
-- 📦 **Export from Flomo**
+### 📦 **Export from Flomo**
   - Go to `Account Details` 
   - Select `Export All (in HTML)`
   > <img src="https://raw.githubusercontent.com/jia6y/flomo-to-obsidian/main/assets/export_from_flomo_2.jpg" width="230">
   - Click on `Start to export`
 
-- 🎉 **Import to Obsidian**
+### 🎉 **Import to Obsidian**
   - Enable `Flomo Importer` plugin
   > <img src="https://raw.githubusercontent.com/jia6y/flomo-to-obsidian/main/assets/enable.png" width="270">
   
