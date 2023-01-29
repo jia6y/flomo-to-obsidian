@@ -17,6 +17,7 @@ export class ImporterUI extends Modal {
     fsa: DataAdapter;
     targetRoot: string;
     memoRoot: string;
+    isDeltaLoadMode: string;
 
     constructor(app: App, plugin: Plugin) {
         super(app);
@@ -27,6 +28,7 @@ export class ImporterUI extends Modal {
         this.rawPath = "";
         this.targetRoot = "flomo";
         this.memoRoot = "memos";
+        this.isDeltaLoadMode = "Yes";
         console.log("ImporterUI Class Loaded");
     }
 
@@ -52,14 +54,25 @@ export class ImporterUI extends Modal {
                 const re = /!\[\]\(file\//gi;
                 const memoSubPath = `${this.targetRoot}/${this.memoRoot}/${tsp}`;
                 memo = memo.replace(re, "![](flomo/");
+
                 // create memo files
-                this.fsa.exists(`${memoSubPath}`).then((tsp_res) => {
-                    if (!tsp_res) {
+                this.fsa.exists(`${memoSubPath}`).then((memoFolderExists) => {
+                    if (!memoFolderExists) {
                         this.fsa.mkdir(`${memoSubPath}`);
                         console.debug(`DEBUG: creating subfoder -> ${memoSubPath}`);
                     }
-                    console.debug(`DEBUG: creating memo -> ${memoSubPath}/memo@${title}.md`);
-                    this.fsa.write(`${memoSubPath}/memo@${title}.md`, memo);
+
+                    const memoFilePath = `${memoSubPath}/memo@${title}.md`;
+
+                    this.fsa.exists(`${memoFilePath}`).then((memoFileExists) => {
+                        if (!(memoFileExists && this.isDeltaLoadMode == "Yes")) {
+                            console.debug(`DEBUG: creating memo -> ${memoSubPath}/memo@${title}.md`);
+                            this.fsa.write(`${memoFilePath}`, memo);
+                        } else {
+                            console.debug(`DEBUG: Delta Load, skipp ${memoFilePath}`)
+                        }
+                    });
+
                     // update status in status bar
                     //this.statusBar.setText(`[${(++proogress).toString()}/${this.fdl.stat["memo"].toString()}] Flomo Memos imported.`);
                 });
@@ -114,6 +127,8 @@ export class ImporterUI extends Modal {
                 this.importMemo();
                 this.createFlomoIndex();
                 this.copyAttachments();
+                // reset flomo exported file path to empty.
+                this.rawPath = "";
             }
             catch (err) {
                 console.log(err);
@@ -152,13 +167,26 @@ export class ImporterUI extends Modal {
         new Setting(contentEl)
             .setName('Memos location')
             .setDesc('set the target location to store memos')
-            .addText(text => text
+            .addText((text) => text
                 .setPlaceholder('memos')
                 .setValue(this.memoRoot)
                 .onChange(async (value) => {
                     this.memoRoot = value;
                     console.debug(`DEBUG: Updated memoRoot -> ${this.memoRoot}`);
-                }))
+                }));
+
+        new Setting(contentEl)
+            .setName('Skip existing memos?')
+            .setDesc('Set for delta load or full load')
+            .addDropdown((drp) => {
+                drp.addOption("Yes", "Delta Load, skip existing memos")
+                    .addOption("No", "Full Load, override existing memos")
+                    .setValue(this.isDeltaLoadMode)
+                    .onChange(async (value) => {
+                        this.isDeltaLoadMode = value;
+                        console.debug(`DEBUG: Updated deltaLoadMode -> ${this.isDeltaLoadMode}`);
+                    })
+            });
 
         new Setting(contentEl)
             .addButton((btn) => {
