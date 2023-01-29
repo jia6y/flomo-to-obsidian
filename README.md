@@ -33,7 +33,7 @@ Author: [Jialu Y](https://github.com/jia6y)
   > <img src="https://raw.githubusercontent.com/jia6y/flomo-to-obsidian/main/assets/import_btn_2.png" width="150">
   
   - Choose flomo.zip for Import. The `Target location` is where to store your memos.
-  > <img src="https://raw.githubusercontent.com/jia6y/flomo-to-obsidian/main/assets/import_ui.png" width="500">
+  > <img src="https://raw.githubusercontent.com/jia6y/flomo-to-obsidian/main/assets/import_ui.jpg" width="500">
   
   - Notification when import completed.
   > <img src="https://raw.githubusercontent.com/jia6y/flomo-to-obsidian/main/assets/notice.png" width="200">
