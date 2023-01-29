@@ -39,7 +39,7 @@ Author: [Jialu Y](https://github.com/jia6y)
   > <img src="https://raw.githubusercontent.com/jia6y/flomo-to-obsidian/main/assets/notice.png" width="200">
   
   - Checkout **Flmomo Moments** 🌅
-  > <img src="https://raw.githubusercontent.com/jia6y/flomo-to-obsidian/main/assets/moments_3.png" width="600">
+  > <img src="https://raw.githubusercontent.com/jia6y/flomo-to-obsidian/main/assets/moments_3.png" width="800">
 
 <br />
 
