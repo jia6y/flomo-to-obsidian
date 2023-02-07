@@ -1,7 +1,7 @@
 # Flomo Importer
 
 ### ☕️ Make Flomo Memos to Obsidian Notes.
-##### 💡 (**Note:** This is not an offcial solution by Flomo) 
+
 <br />
 
 Author: [Jialu Y](https://github.com/jia6y)
