@@ -6,5 +6,5 @@
 	"description": "Make Flomo Memos to Obsidian Notes",
 	"author": "Jialu Y",
 	"authorUrl": "https://github.com/jia6y",
-	"isDesktopOnly": false
+	"isDesktopOnly": true
 }
