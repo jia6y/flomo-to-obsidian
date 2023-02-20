@@ -5,9 +5,6 @@ import { Importer } from './flomo';
 export class ImporterUI extends Modal {
     plugin: Plugin;
     rawPath: string;
-    isDeltaLoadMode: string;
-    memoRoot: string;
-    targetRoot: string
 
     constructor(app: App, plugin: Plugin) {
         super(app);
