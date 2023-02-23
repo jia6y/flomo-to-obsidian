@@ -13,8 +13,6 @@ export class ImporterUI extends Modal {
     }
 
     onSubmit() {
-        const flomoDataFile = this.rawPath;
-        const flomo_importer = new Importer(this.app, flomoDataFile);
         const targetMemoLocation = this.plugin.settings.flomoTarget + "/" + 
                                    this.plugin.settings.memoTarget;
         
@@ -25,6 +23,8 @@ export class ImporterUI extends Modal {
             }
 
             try {
+                
+                const flomo_importer = new Importer(this.app, this.rawPath);
                 flomo_importer.import(this.plugin.settings.flomoTarget, 
                                       this.plugin.settings.memoTarget, 
                                       this.plugin.settings.isDeltaLoadMode,
