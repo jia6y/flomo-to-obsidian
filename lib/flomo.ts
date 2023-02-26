@@ -51,7 +51,6 @@ class Flomo {
 
 
 export class Importer {
-
     private app: App
     private flomo: Flomo;
     private sourceDataPath: string;
@@ -67,7 +66,7 @@ export class Importer {
         const basePath = this.app.vault.adapter.basePath;
 
         // import memos
-        this.flomo.memos(async (title, date, memo) => {
+        this.flomo.memos((title, date, memo): void => {
             const memoSubFolder = `${memoDir}/${date}`;
             const memoFilePath = `${memoSubFolder}/memo@${title}.md`;
             fs.mkdirpSync(`${basePath}/${memoSubFolder}`);
