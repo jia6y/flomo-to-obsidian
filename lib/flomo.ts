@@ -5,7 +5,9 @@ import *  as fs from 'fs-extra';
 import { parse, HTMLElement } from 'node-html-parser';
 import { NodeHtmlMarkdown } from 'node-html-markdown';
 import { App } from 'obsidian';
+
 import decompress from 'decompress';
+import * as parse5 from "parse5"
 
 
 class Flomo {
@@ -14,28 +16,31 @@ class Flomo {
 
     stat: Record<string, number>
 
-    constructor(path: string) {
-        const flomoData = fs.readFileSync(path, "utf8");
+    constructor(flomoData: string) {
         const root = parse(flomoData);
         this.memoNodes = root.querySelectorAll(".memo");
         this.tagNodes = root.getElementById("tag").querySelectorAll("option");
-        this.stat = { "memo": this.memoNodes.length, 
-                      "tag": this.tagNodes.length }
+        this.stat = { "memo": this.memoNodes.length, "tag": this.tagNodes.length }
     }
 
-    memos(fn: (title: string, tsp_date: string, memo: string) => any): void {
+    memos(): Record<string, string>[] {
+        const res: Record<string, string>[] = [];
         this.memoNodes.forEach(i => {
-            const title = this.extrtactTitle(i.querySelector(".time").textContent);
-            const tspDate = i.querySelector(".time").textContent.split(" ")[0];
-            const mdContent = `Created at:  ${this.extractContent(i.innerHTML)}`
-            fn(title, tspDate, mdContent)
+            res.push({
+                        "title": (this.extrtactTitle(i.querySelector(".time").textContent)) as string,
+                        "date": (i.querySelector(".time").textContent.split(" ")[0]) as string,
+                        "content": `Created at:  ${this.extractContent(i.innerHTML)}`
+                    })
         });
+        return res;
     }
 
-    tags(fn: (tag: string) => any): void {
+    tags(): string[] {
+        const res: string[] = [];
         this.tagNodes.slice(1).forEach(i => {
-            fn(i.textContent)
+            res.push(i.textContent);
         })
+        return res;
     }
 
     private extrtactTitle(item: string): string {
@@ -50,72 +55,96 @@ class Flomo {
 }
 
 
-export class Importer {
-    private app: App
-    private flomo: Flomo;
-    private sourceDataPath: string;
+export class FlomoImporter {
+    private config: Record<string, string>;
+    private app: App;
   
-    constructor(app: App, sourceDataPath: string) {
+    constructor(app: App, config: Record<string, string>) {
+        this.config = config;
         this.app = app;
-        this.sourceDataPath = sourceDataPath;
-        this.flomo = new Flomo(sourceDataPath);
+        this.config["baseDir"] = app.vault.adapter.basePath;
     }
 
-    import(targetRoot:string, memoRoot:string, isDeltaLoadMode: string, cb: (flomo: Flomo) => any):void { 
-        const memoDir = `${targetRoot}/${memoRoot}`;
-        const basePath = this.app.vault.adapter.basePath;
+    private async sanitize(path: string): Promise<string>{
+        const flomoData = await fs.readFile(path, "utf8");
+        const document = parse5.parse(flomoData);
+        return parse5.serialize(document);
+    }
 
-        // import memos
-        this.flomo.memos((title, date, memo): void => {
-            const memoSubFolder = `${memoDir}/${date}`;
-            const memoFilePath = `${memoSubFolder}/memo@${title}.md`;
-            fs.mkdirpSync(`${basePath}/${memoSubFolder}`);
-        
-            if(!(fs.existsSync(`${basePath}/${memoFilePath}`) && isDeltaLoadMode == "Yes")){
-                this.app.vault.adapter.write(
+    private async importMemos(flomo: Flomo): Promise<void> {
+        for(const memo of flomo.memos()){
+            const memoSubDir = `${this.config["rootDir"]}/${this.config["memoDir"]}/${memo["date"]}`;
+            const memoFilePath = `${memoSubDir}/memo@${memo["title"]}.md`;
+
+            await fs.mkdirp(`${this.config["baseDir"]}/${memoSubDir}`);
+
+            if(!(await fs.exists(`${this.config["baseDir"]}/${memoFilePath}`) && this.config["isDelataMode"] == "Yes")){
+                await this.app.vault.adapter.write(
                     `${memoFilePath}`, 
-                    memo.replace(/!\[\]\(file\//gi, "![](flomo/")
+                    memo["content"].replace(/!\[\]\(file\//gi, "![](flomo/")
                 );
-                console.debug(`DEBUG: creating ${memoFilePath}`)
+                //console.debug(`DEBUG: creating ${memoFilePath}`)
             }else{
                 console.debug(`DEBUG: DeltaLoad, skipping ${memoFilePath}`)
             }
-        })
+        }
+    }
 
-        // generate moments
-        if (this.flomo.stat["memo"] > 0) {
+    private async generateMoments(flomo: Flomo): Promise<void> {
+        if (flomo.stat["memo"] > 0) {
             const buffer: string[] = [];
             const tags: string[] = [];
-            const index_file = `${targetRoot}/Flomo Moments.md`;
-
+            const index_file = `${this.config["rootDir"]}/Flomo Moments.md`;
+    
             buffer.push(`updated at: ${(new Date()).toLocaleString()}\n\n`);
-            this.flomo.tags((tag) => {tags.push(`#${tag}`);});
+
+            for(const tag of flomo.tags()){
+                tags.push(`#${tag}`); 
+            };
+
             buffer.push(tags.join(' ') + "\n\n---\n\n");
+    
+            for(const memo of flomo.memos())  {
+                buffer.push(`![[${this.config["memoDir"]}/${memo["date"].split(" ")[0]}/memo@${memo["title"]}]]\n\n---\n\n`);
+            };
 
-            this.flomo.memos((title, tsp, memo) => {
-                buffer.push(`![[${memoDir}/${tsp.split(" ")[0]}/memo@${title}]]\n\n---\n\n`);
-            });
+            await this.app.vault.adapter.write(index_file, buffer.join("\n"));
 
-            this.app.vault.adapter.write(index_file, buffer.join("\n"));
         }
+    }
 
-        // copy attachments over to vault
-        const attachementDir = fs.readJsonSync(`${basePath}/${this.app.vault.configDir}/app.json`)["attachmentFolderPath"] + "/flomo/";
+    async import(): Promise<Flomo> { 
+        // 1. create workspace
         const tmpRoot = path.join(os.homedir(), ".flomo/cache/");
         const tmpDir = path.join(tmpRoot, "data")
-        fs.mkdirpSync(tmpDir);
+        
+        await fs.mkdirp(tmpDir);
 
-        decompress(this.sourceDataPath, tmpDir)
-            .then((files) => {
-                for (const f of files) {
-                    if (f.type == "directory" && f.path.endsWith("/file/")) {
-                        console.debug(`DEBUG: copying from ${tmpDir}/${f.path} to ${basePath}/${attachementDir}`)
-                        fs.copySync(`${tmpDir}/${f.path}`, `${basePath}/${attachementDir}`);
-                        fs.removeSync(tmpDir);
-                        break
-                    }
-                }
-                cb(this.flomo);
-            })
+        // 2. unzip flomo_backup.zip to workspace
+        const files = await decompress(this.config["rawDir"], tmpDir)
+
+        // 3. import Memos
+        const backupFolderName = `flomo@${this.config["rawDir"].split("@")[1].replace(".zip", "")}`
+        const backupData = await this.sanitize(`${tmpDir}/${backupFolderName}/index.html`)
+        const flomo = new Flomo(backupData);
+        await this.importMemos(flomo)
+
+        // 4. generate Moments
+        await this.generateMoments(flomo);
+
+        // 5. copy attachments to ObVault
+        const obVaultConfig = await fs.readJson(`${this.config["baseDir"]}/${this.app.vault.configDir}/app.json`)
+        const attachementDir = obVaultConfig["attachmentFolderPath"] + "/flomo/";
+        for (const f of files) {
+            if (f.type == "directory" && f.path.endsWith("/file/")) {
+                console.debug(`DEBUG: copying from ${tmpDir}/${f.path} to ${this.config["baseDir"]}/${attachementDir}`)
+                await fs.copy(`${tmpDir}/${f.path}`, `${this.config["baseDir"]}/${attachementDir}`);
+                await fs.remove(tmpDir);
+                break
+            }
+        }
+
+        return flomo
     }
+
 }

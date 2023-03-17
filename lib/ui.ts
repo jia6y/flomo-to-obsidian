@@ -1,5 +1,5 @@
 import { App, Modal, Plugin, Setting, Notice } from 'obsidian';
-import { Importer } from './flomo';
+import { FlomoImporter } from './flomo';
 
 
 export class ImporterUI extends Modal {
@@ -12,34 +12,35 @@ export class ImporterUI extends Modal {
         this.rawPath = "";
     }
 
-    onSubmit() {
+    async onSubmit() {
         const targetMemoLocation = this.plugin.settings.flomoTarget + "/" + 
                                    this.plugin.settings.memoTarget;
         
-        this.app.vault.adapter.exists(targetMemoLocation).then((res) => {
-            if (!res) {
-                console.debug(`DEBUG: creating memo root -> ${targetMemoLocation}`);
-                this.app.vault.adapter.mkdir(`${targetMemoLocation}`);
-            }
+        const res = await this.app.vault.adapter.exists(targetMemoLocation);
+        if (!res) {
+            console.debug(`DEBUG: creating memo root -> ${targetMemoLocation}`);
+            await this.app.vault.adapter.mkdir(`${targetMemoLocation}`);
+        }
 
-            try {
-                
-                const flomo_importer = new Importer(this.app, this.rawPath);
-                flomo_importer.import(this.plugin.settings.flomoTarget, 
-                                      this.plugin.settings.memoTarget, 
-                                      this.plugin.settings.isDeltaLoadMode,
-                    (flomo) => {
-                        this.rawPath = "";
-                        new Notice(`🎉 Import Completed.\nTotal: ${flomo.stat["memo"].toString()} memos`)
-                    }
-                );
+        try {
+            const config = {
+                "rawDir": this.rawPath,
+                "rootDir": this.plugin.settings.flomoTarget,
+                "memoDir": this.plugin.settings.memoTarget,
+                "isDelataMode": this.plugin.settings.isDeltaLoadMode
+            };
 
-            }catch (err) {
-                this.rawPath = "";
-                console.log(err);
-                new Notice(`Flomo Importer Error. Details:\n${err}`);
-            }
-        });
+            const flomo = await (new FlomoImporter(this.app, config)).import();
+            
+            new Notice(`🎉 Import Completed.\nTotal: ${flomo.stat["memo"].toString()} memos`)
+            this.rawPath = "";
+
+        }catch (err) {
+            this.rawPath = "";
+            console.log(err);
+            new Notice(`Flomo Importer Error. Details:\n${err}`);
+        }
+
     }
 
     onOpen() {
