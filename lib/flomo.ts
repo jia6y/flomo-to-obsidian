@@ -8,6 +8,10 @@ import { App } from 'obsidian';
 
 import decompress from 'decompress';
 import * as parse5 from "parse5"
+//import * as CryptoJS from 'crypto-js';
+
+
+const FLOMO_CACHE_LOC = path.join(os.homedir(), ".flomo/cache/");
 
 
 class Flomo {
@@ -27,10 +31,10 @@ class Flomo {
         const res: Record<string, string>[] = [];
         this.memoNodes.forEach(i => {
             res.push({
-                        "title": (this.extrtactTitle(i.querySelector(".time").textContent)) as string,
-                        "date": (i.querySelector(".time").textContent.split(" ")[0]) as string,
-                        "content": `Created at:  ${this.extractContent(i.innerHTML)}`
-                    })
+                "title": (this.extrtactTitle(i.querySelector(".time").textContent)) as string,
+                "date": (i.querySelector(".time").textContent.split(" ")[0]) as string,
+                "content": `Created at:  ${this.extractContent(i.innerHTML)} \n\n`
+            })
         });
         return res;
     }
@@ -58,54 +62,53 @@ class Flomo {
 export class FlomoImporter {
     private config: Record<string, string>;
     private app: App;
-  
+
     constructor(app: App, config: Record<string, string>) {
         this.config = config;
         this.app = app;
+        
         this.config["baseDir"] = app.vault.adapter.basePath;
     }
 
-    private async sanitize(path: string): Promise<string>{
+    private async sanitize(path: string): Promise<string> {
         const flomoData = await fs.readFile(path, "utf8");
         const document = parse5.parse(flomoData);
         return parse5.serialize(document);
     }
 
     private async importMemos(flomo: Flomo): Promise<void> {
-        for(const memo of flomo.memos()){
+        for (const [idx, memo] of flomo.memos().entries()) {
             const memoSubDir = `${this.config["rootDir"]}/${this.config["memoDir"]}/${memo["date"]}`;
-            const memoFilePath = `${memoSubDir}/memo@${memo["title"]}.md`;
+            const memoFilePath = `${memoSubDir}/memo@${memo["title"]}_${idx}.md`;
 
             await fs.mkdirp(`${this.config["baseDir"]}/${memoSubDir}`);
+ 
+            const content = memo["content"].replace(/!\[\]\(file\//gi, "![](flomo/");
+            await this.app.vault.adapter.write(
+                `${memoFilePath}`,
+                content
+            );
 
-            if(!(await fs.exists(`${this.config["baseDir"]}/${memoFilePath}`) && this.config["isDelataMode"] == "Yes")){
-                await this.app.vault.adapter.write(
-                    `${memoFilePath}`, 
-                    memo["content"].replace(/!\[\]\(file\//gi, "![](flomo/")
-                );
-                //console.debug(`DEBUG: creating ${memoFilePath}`)
-            }else{
-                console.debug(`DEBUG: DeltaLoad, skipping ${memoFilePath}`)
-            }
         }
     }
 
     private async generateMoments(flomo: Flomo): Promise<void> {
+
         if (flomo.stat["memo"] > 0) {
             const buffer: string[] = [];
             const tags: string[] = [];
             const index_file = `${this.config["rootDir"]}/Flomo Moments.md`;
-    
+
             buffer.push(`updated at: ${(new Date()).toLocaleString()}\n\n`);
 
-            for(const tag of flomo.tags()){
-                tags.push(`#${tag}`); 
+            for (const tag of flomo.tags()) {
+                tags.push(`#${tag}`);
             };
 
             buffer.push(tags.join(' ') + "\n\n---\n\n");
-    
-            for(const memo of flomo.memos())  {
-                buffer.push(`![[${this.config["memoDir"]}/${memo["date"].split(" ")[0]}/memo@${memo["title"]}]]\n\n---\n\n`);
+
+            for (const [idx, memo] of flomo.memos().entries()) {
+                buffer.push(`![[${this.config["memoDir"]}/${memo["date"].split(" ")[0]}/memo@${memo["title"]}_${idx}]]\n\n---\n\n`);
             };
 
             await this.app.vault.adapter.write(index_file, buffer.join("\n"));
@@ -113,19 +116,16 @@ export class FlomoImporter {
         }
     }
 
-    async import(): Promise<Flomo> { 
+    async import(): Promise<Flomo> {
         // 1. create workspace
-        const tmpRoot = path.join(os.homedir(), ".flomo/cache/");
-        const tmpDir = path.join(tmpRoot, "data")
-        
+        const tmpDir = path.join(FLOMO_CACHE_LOC, "data")
         await fs.mkdirp(tmpDir);
 
         // 2. unzip flomo_backup.zip to workspace
         const files = await decompress(this.config["rawDir"], tmpDir)
 
         // 3. import Memos
-        const backupFolderName = `flomo@${this.config["rawDir"].split("@")[1].replace(".zip", "")}`
-        const backupData = await this.sanitize(`${tmpDir}/${backupFolderName}/index.html`)
+        const backupData = await this.sanitize(`${tmpDir}/${files[0].path}/index.html`)
         const flomo = new Flomo(backupData);
         await this.importMemos(flomo)
 

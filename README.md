@@ -36,7 +36,7 @@ Author: [Jialu Y](https://github.com/jia6y)
   - Choose flomo.zip for Import. The `Target location` is where to store your memos.
   > <img src="https://raw.githubusercontent.com/jia6y/flomo-to-obsidian/main/assets/import_ui.jpg" width="600">
   
-  - Notification when import completed.
+  - A Notice pops up when import completed.
   > <img src="https://raw.githubusercontent.com/jia6y/flomo-to-obsidian/main/assets/notice.png" width="220">
   
   - Checkout **Flmomo Moments** 🌅
@@ -45,7 +45,7 @@ Author: [Jialu Y](https://github.com/jia6y)
 <br />
 
 ## Support 🧑🏻‍💻
-Please feel free to reach out to me if there's any issue or questions. :)
+Please feel free to reach out to me or log an Issue here if there's any questions. :)
 
 <br />
 

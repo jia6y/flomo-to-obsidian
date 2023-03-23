@@ -79,7 +79,7 @@ export class ImporterUI extends Modal {
                     this.plugin.settings.memoTarget = value;
                 }));
 
-        new Setting(contentEl)
+        /*new Setting(contentEl)
             .setName('Skip existing memos?')
             .setDesc('Set for delta load or full load')
             .addDropdown((drp) => {
@@ -89,7 +89,7 @@ export class ImporterUI extends Modal {
                     .onChange(async (value) => {
                         this.plugin.settings.isDeltaLoadMode = value;
                     })
-            });
+            });*/
 
         new Setting(contentEl)
             .addButton((btn) => {
