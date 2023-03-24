@@ -8,7 +8,6 @@ import { App } from 'obsidian';
 
 import decompress from 'decompress';
 import * as parse5 from "parse5"
-//import * as CryptoJS from 'crypto-js';
 
 
 const FLOMO_CACHE_LOC = path.join(os.homedir(), ".flomo/cache/");
@@ -79,7 +78,7 @@ export class FlomoImporter {
     private async importMemos(flomo: Flomo): Promise<void> {
         for (const [idx, memo] of flomo.memos().entries()) {
             const memoSubDir = `${this.config["rootDir"]}/${this.config["memoDir"]}/${memo["date"]}`;
-            const memoFilePath = `${memoSubDir}/memo@${memo["title"]}_${idx}.md`;
+            const memoFilePath = `${memoSubDir}/memo@${memo["title"]}_${flomo.stat["memo"] - idx}.md`;
 
             await fs.mkdirp(`${this.config["baseDir"]}/${memoSubDir}`);
  
@@ -108,7 +107,7 @@ export class FlomoImporter {
             buffer.push(tags.join(' ') + "\n\n---\n\n");
 
             for (const [idx, memo] of flomo.memos().entries()) {
-                buffer.push(`![[${this.config["memoDir"]}/${memo["date"].split(" ")[0]}/memo@${memo["title"]}_${idx}]]\n\n---\n\n`);
+                buffer.push(`![[${this.config["memoDir"]}/${memo["date"].split(" ")[0]}/memo@${memo["title"]}_${flomo.stat["memo"] - idx}]]\n\n---\n\n`);
             };
 
             await this.app.vault.adapter.write(index_file, buffer.join("\n"));
@@ -117,6 +116,7 @@ export class FlomoImporter {
     }
 
     async import(): Promise<Flomo> {
+        
         // 1. create workspace
         const tmpDir = path.join(FLOMO_CACHE_LOC, "data")
         await fs.mkdirp(tmpDir);

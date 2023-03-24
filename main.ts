@@ -1,5 +1,5 @@
 import { Plugin, Modal } from 'obsidian';
-import { ImporterUI } from 'lib/ui';
+import { ImporterUI } from './lib/ui';
 
 interface MyPluginSettings {
 	flomoTarget: string,
