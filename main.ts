@@ -3,14 +3,14 @@ import { ImporterUI } from './lib/ui';
 
 interface MyPluginSettings {
 	flomoTarget: string,
-	memoTarget: string,
-	isDeltaLoadMode: string,
+	memoTarget: string
+	//isDeltaLoadMode: string,
 }
 
 const DEFAULT_SETTINGS: MyPluginSettings = {
 	flomoTarget: 'flomo',
-	memoTarget: 'memos',
-	isDeltaLoadMode: 'No'
+	memoTarget: 'memos'
+	//isDeltaLoadMode: 'No'
 }
 
 export default class FlomoImporterPlugin extends Plugin {

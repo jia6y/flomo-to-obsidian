@@ -26,8 +26,8 @@ export class ImporterUI extends Modal {
             const config = {
                 "rawDir": this.rawPath,
                 "rootDir": this.plugin.settings.flomoTarget,
-                "memoDir": this.plugin.settings.memoTarget,
-                "isDelataMode": this.plugin.settings.isDeltaLoadMode
+                "memoDir": this.plugin.settings.memoTarget
+                //"isDelataMode": this.plugin.settings.isDeltaLoadMode
             };
 
             const flomo = await (new FlomoImporter(this.app, config)).import();
