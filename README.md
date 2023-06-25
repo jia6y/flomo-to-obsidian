@@ -38,15 +38,14 @@ Author: [Jialu Y](https://github.com/jia6y)
   
   - Choose flomo.zip to Import. The `Flomo & Memo location` is where to store your memos.
     
-    <img width="500" alt="image" src="https://github.com/jia6y/flomo-to-obsidian/assets/1456952/23386c5e-39e3-4200-8fcf-fb8e7cfa2776">
+    <img width="360" alt="image" src="https://github.com/jia6y/flomo-to-obsidian/assets/1456952/23386c5e-39e3-4200-8fcf-fb8e7cfa2776">
   
   - A Notice pops up when the import is completed.
     
-    <img src="https://raw.githubusercontent.com/jia6y/flomo-to-obsidian/main/assets/notice.png" width="180">
-  
-  - Checkout **Flmomo Moments** 🌅
-    
-    <img src="https://raw.githubusercontent.com/jia6y/flomo-to-obsidian/main/assets/moments_3.png" width="550">
+  - Checkout **Flmomo Moments** and **Flomo Canvas** 🌅
+
+    <img width="252" alt="image" src="https://github.com/jia6y/flomo-to-obsidian/assets/1456952/b1bd2399-87f1-4d60-80cf-111bbce8fe68">
+
 
 <br />
 
