@@ -3,14 +3,18 @@ import { ImporterUI } from './lib/ui';
 
 interface MyPluginSettings {
 	flomoTarget: string,
-	memoTarget: string
-	//isDeltaLoadMode: string,
+	memoTarget: string,
+	optionsMoments: string,
+	optionsCanvas: string,
+	expOptionAllowbilink: boolean
 }
 
 const DEFAULT_SETTINGS: MyPluginSettings = {
 	flomoTarget: 'flomo',
-	memoTarget: 'memos'
-	//isDeltaLoadMode: 'No'
+	memoTarget: 'memos',
+	optionsMoments: "copy_with_link",
+	optionsCanvas: "copy_with_link",
+	expOptionAllowbilink: true
 }
 
 export default class FlomoImporterPlugin extends Plugin {
@@ -47,6 +51,7 @@ export default class FlomoImporterPlugin extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings);
+		
 	}
 
 }
