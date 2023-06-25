@@ -1,54 +1,53 @@
 # Flomo Importer
 
-### ☕️ Make Flomo Memos to Obsidian Notes.
-
-<br />
+##### ☕️ Make Flomo Memos to Obsidian Notes.
 
 Author: [Jialu Y](https://github.com/jia6y)
 <br />
+
+<img width="550" alt="image" src="https://github.com/jia6y/flomo-to-obsidian/assets/1456952/23386c5e-39e3-4200-8fcf-fb8e7cfa2776">
 <br />
-## Features supported
-- Import Flomo memos to Obsidian
-- Merge Flomo Atttachmets into Obsidian attachment folder
-- Update Attachment links within Flomo memos to point to Obsidian attachment location
+
+### Features supported
+- Import Flomo memos with attachments to Obsidian
 - Customize target vault location to import
-- Memo Load Mode: Delta Load / Full Load
-- Generate `Flomo Moments`
+- Optional: Create `Flomo Canvas` (with content | filelink)
+- Optional: Create `Flomo Moments`
+- Experimental: Support Bi-directional Link in memos
 
 <br />
 
-## First time to use it?
+### First time to use it?
 
-### 📦 **Export from Flomo**
+##### 1. 📦 **Export from Flomo**
   - Go to `Account Details` 
   - Select `Export All (in HTML)`
-  > <img src="https://raw.githubusercontent.com/jia6y/flomo-to-obsidian/main/assets/export_from_flomo_2.jpg" width="380">
+    > <img src="https://raw.githubusercontent.com/jia6y/flomo-to-obsidian/main/assets/export_from_flomo_2.jpg" width="360">
   - Click on `Start to export`
 
-### 🎉 **Import to Obsidian**
+##### 2. 🎯 **Import to Obsidian**
   - Enable `Flomo Importer` plugin
-  > <img src="https://raw.githubusercontent.com/jia6y/flomo-to-obsidian/main/assets/enable.png" width="360">
+    > <img src="https://raw.githubusercontent.com/jia6y/flomo-to-obsidian/main/assets/enable.png" width="350">
   
   - Use command `Open Flomo Importer`, or use `Import Button`
-  > <img src="https://raw.githubusercontent.com/jia6y/flomo-to-obsidian/main/assets/import_cmd_2.png" width="360">
-  > <img src="https://raw.githubusercontent.com/jia6y/flomo-to-obsidian/main/assets/import_btn_2.png" width="200">
+    > <img src="https://raw.githubusercontent.com/jia6y/flomo-to-obsidian/main/assets/import_btn_2.png" width="180">
   
-  - Choose flomo.zip for Import. The `Target location` is where to store your memos.
-  > <img src="https://raw.githubusercontent.com/jia6y/flomo-to-obsidian/main/assets/import_ui.jpg" width="600">
+  - Choose flomo.zip to Import. The `Flomo & Memo location` is where to store your memos.
+    > <img width="500" alt="image" src="https://github.com/jia6y/flomo-to-obsidian/assets/1456952/23386c5e-39e3-4200-8fcf-fb8e7cfa2776">
   
   - A Notice pops up when import completed.
-  > <img src="https://raw.githubusercontent.com/jia6y/flomo-to-obsidian/main/assets/notice.png" width="220">
+    > <img src="https://raw.githubusercontent.com/jia6y/flomo-to-obsidian/main/assets/notice.png" width="200">
   
   - Checkout **Flmomo Moments** 🌅
-  > <img src="https://raw.githubusercontent.com/jia6y/flomo-to-obsidian/main/assets/moments_3.png" width="1000">
+    > <img src="https://raw.githubusercontent.com/jia6y/flomo-to-obsidian/main/assets/moments_3.png" width="600">
 
 <br />
 
-## Support 🧑🏻‍💻
+### Support 🧑🏻‍💻
 Please feel free to reach out to me or log an Issue here if there's any questions. :)
 
 <br />
 
-## Buy me a coffee ☕️
+### Buy me a coffee ☕️
 
 <img src="https://raw.githubusercontent.com/jia6y/flomo-to-obsidian/main/assets/buy_me_a_coffee.jpeg" width="230">
