@@ -29,22 +29,22 @@ export class FlomoImporter {
         return parse5.serialize(document);
     }
 
-    private async importMemos(flomo: Flomo, timeRange: string): Promise<void> {
+    private async importMemos(flomo: Flomo): Promise<void> {
         for (const [idx, memo] of flomo.memos().entries()) {
 
             const memoSubDir = `${this.config["flomoTarget"]}/${this.config["memoTarget"]}/${memo["date"]}`;
             const memoFilePath = `${memoSubDir}/memo@${memo["title"]}_${flomo.stat["memo"] - idx}.md`;
 
             await fs.mkdirp(`${this.config["baseDir"]}/${memoSubDir}`);
- 
+
             const content = (() => {
                 const res = memo["content"].replace(/!\[\]\(file\//gi, "![](flomo/");
-                if(this.config["expOptionAllowbilink"] == true){
+                if (this.config["expOptionAllowbilink"] == true) {
                     return res.replace(`\\[\\[`, "[[").replace(`\\]\\]`, "]]")
                 }
                 return res;
             })();
-            
+
             await this.app.vault.adapter.write(
                 `${memoFilePath}`,
                 content
@@ -53,7 +53,7 @@ export class FlomoImporter {
     }
 
     async import(): Promise<Flomo> {
-        
+
         // 1. create workspace
         const tmpDir = path.join(FLOMO_CACHE_LOC, "data")
         await fs.mkdirp(tmpDir);
@@ -65,7 +65,7 @@ export class FlomoImporter {
         // 3. copy attachments to ObVault
         const obVaultConfig = await fs.readJson(`${this.config["baseDir"]}/${this.app.vault.configDir}/app.json`)
         const attachementDir = obVaultConfig["attachmentFolderPath"] + "/flomo/";
-        
+
         for (const f of files) {
             if (f.type == "directory" && f.path.endsWith("/file/")) {
                 console.debug(`DEBUG: copying from ${tmpDir}/${f.path} to ${this.config["baseDir"]}/${attachementDir}`)
@@ -79,23 +79,23 @@ export class FlomoImporter {
         const backupData = await this.sanitize(`${tmpDir}/${files[0].path}/index.html`)
         const flomo = new Flomo(backupData);
 
-        await this.importMemos(flomo, this.config["timeRange"])
+        await this.importMemos(flomo)
 
 
         // 5. Ob Intergations
         // If Generate Moments
-        if(this.config["optionsMoments"] != "skip"){
+        if (this.config["optionsMoments"] != "skip") {
             await generateMoments(app, flomo, this.config);
         }
 
         // If Generate Canvas
-        if(this.config["optionsCanvas"] != "skip"){
+        if (this.config["optionsCanvas"] != "skip") {
             await generateCanvas(app, flomo, this.config);
         }
 
         // 6. Cleanup Workspace
         await fs.remove(tmpDir);
-        
+
         return flomo
     }
 

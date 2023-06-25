@@ -12,10 +12,10 @@ export class ImporterUI extends Modal {
         this.rawPath = "";
     }
 
-    async onSubmit() :Promise<void> {
-        const targetMemoLocation = this.plugin.settings.flomoTarget + "/" + 
-                                   this.plugin.settings.memoTarget;
-        
+    async onSubmit(): Promise<void> {
+        const targetMemoLocation = this.plugin.settings.flomoTarget + "/" +
+            this.plugin.settings.memoTarget;
+
         const res = await this.app.vault.adapter.exists(targetMemoLocation);
         if (!res) {
             console.debug(`DEBUG: creating memo root -> ${targetMemoLocation}`);
@@ -25,21 +25,14 @@ export class ImporterUI extends Modal {
         try {
             const config = this.plugin.settings;
             config["rawDir"] = this.rawPath;
-            //const config = {
-            //    "rawDir": this.rawPath,
-            //    "rootDir": this.plugin.settings.flomoTarget,
-            //    "memoDir": this.plugin.settings.memoTarget,
-            //    "optionsMoments": this.plugin.settings.optionsMoments, 
-            //    "optionsCanvas": this.plugin.settings.optionsCanvas,
-            //    "expOptionAllowdilink": this.plugin.settings.expOptionAllowdilink,
-            //};
 
             const flomo = await (new FlomoImporter(this.app, config)).import();
-            
+
             new Notice(`🎉 Import Completed.\nTotal: ${flomo.stat["memo"].toString()} memos`)
             this.rawPath = "";
 
-        }catch (err) {
+
+        } catch (err) {
             this.rawPath = "";
             console.log(err);
             new Notice(`Flomo Importer Error. Details:\n${err}`);
@@ -51,7 +44,6 @@ export class ImporterUI extends Modal {
         const { contentEl } = this;
         contentEl.empty();
         contentEl.createEl("h3", { text: "Flomo Importer" });
-        //contentEl.createEl("br");
 
         const fileLocContol: HTMLInputElement = contentEl.createEl("input", { type: "file", cls: "uploadbox" })
         fileLocContol.setAttr("accept", ".zip");
@@ -82,61 +74,43 @@ export class ImporterUI extends Modal {
                     this.plugin.settings.memoTarget = value;
                 }));
 
-        //new Setting(contentEl)
-        //   .setName('Time Range')
-        //   .setDesc('set time range for import')
-        //   .addDropdown((drp) => {
-        //        drp.addOption("@*", "All Memos")
-        //           .addOption("@d", "Today")
-        //           .addOption("@7", "Last 7 Days")
-        //           .addOption("@30", "Last 30 Days")
-        //           .addOption("@90", "Last 90 Days")
-        //           .setValue(this.plugin.settings.timeRange)
-        //           .onChange(async (value) => {
-        //               this.plugin.settings.timeRange = value;
-        //           })
-        //   });
-        
-
         new Setting(contentEl)
             .setName('Moments Options')
             .setDesc('set moments options')
             .addDropdown((drp) => {
-                 drp.addOption("copy_with_link", "Generate Moments")
+                drp.addOption("copy_with_link", "Generate Moments")
                     .addOption("skip", "Skip Moments")
                     .setValue(this.plugin.settings.optionsMoments)
                     .onChange(async (value) => {
                         this.plugin.settings.optionsMoments = value;
                     })
             })
-        
 
         new Setting(contentEl)
             .setName('Canvas Options')
             .setDesc('set canvas options')
             .addDropdown((drp) => {
                 drp.addOption("copy_with_link", "Generate Canvas")
-                   .addOption("copy_with_content", "Generate Canvas with content")
-                   .addOption("skip", "Skip Canvas")
-                   .setValue(this.plugin.settings.optionsCanvas)
-                   .onChange(async (value) => {
-                       this.plugin.settings.optionsCanvas = value;
-                   })
-           });
+                    .addOption("copy_with_content", "Generate Canvas with content")
+                    .addOption("skip", "Skip Canvas")
+                    .setValue(this.plugin.settings.optionsCanvas)
+                    .onChange(async (value) => {
+                        this.plugin.settings.optionsCanvas = value;
+                    })
+            });
 
-        new Setting(contentEl)
-           .setName('Experimental Options')
-           .setDesc('set experimental options')
-            
-        const expOptionBlock: HTMLDivElement = contentEl.createEl("div", {cls: "mdOptionBlock"});
+        new Setting(contentEl).setName('Experimental Options').setDesc('set experimental options')
+
+        const expOptionBlock: HTMLDivElement = contentEl.createEl("div", { cls: "expOptionBlock" });
         const expOptionLabel: HTMLLabelElement = expOptionBlock.createEl("label");
-        const allowBiLink: HTMLInputElement = expOptionLabel.createEl("input", { type: "checkbox", cls: "ckbox"})
+        const allowBiLink: HTMLInputElement = expOptionLabel.createEl("input", { type: "checkbox", cls: "ckbox" })
         allowBiLink.checked = this.plugin.settings.expOptionAllowbilink;
         allowBiLink.onchange = (ev) => {
             this.plugin.settings.expOptionAllowbilink = ev.currentTarget.checked;
         };
+
         expOptionLabel.createEl("small", { text: "Convert bidirectonal link: [[link]]" });
-        
+
 
         new Setting(contentEl)
             .addButton((btn) => {
@@ -168,5 +142,4 @@ export class ImporterUI extends Modal {
         const { contentEl } = this;
         contentEl.empty();
     }
-
 } 

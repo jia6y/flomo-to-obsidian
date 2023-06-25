@@ -40,10 +40,10 @@ export default class FlomoImporterPlugin extends Plugin {
 				importerUI.open();
 			},
 		});
-
 	}
 
-	onunload() {}
+
+	onunload() { }
 
 	async loadSettings() {
 		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
@@ -51,7 +51,7 @@ export default class FlomoImporterPlugin extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings);
-		
+
 	}
 
 }
