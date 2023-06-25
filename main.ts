@@ -1,5 +1,6 @@
-import { Plugin, Modal } from 'obsidian';
+import { addIcon, Plugin, Modal } from 'obsidian';
 import { ImporterUI } from './lib/ui';
+
 
 interface MyPluginSettings {
 	flomoTarget: string,
@@ -19,30 +20,29 @@ const DEFAULT_SETTINGS: MyPluginSettings = {
 
 export default class FlomoImporterPlugin extends Plugin {
 	settings: MyPluginSettings;
-
 	async onload() {
+
 		await this.loadSettings();
 		const importerUI: Modal = new ImporterUI(this.app, this);
 
-		// This creates an icon in the left ribbon.
-		const ribbonIconEl = this.addRibbonIcon('dice', 'Flomo Importer', (evt: MouseEvent) => {
+		addIcon("target", `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-target"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>`);
+		const ribbonIconEl = this.addRibbonIcon('target', 'Flomo Importer', (evt: MouseEvent) => {
 			importerUI.open();
 		});
 
-		// Perform additional things with the ribbon
 		ribbonIconEl.addClass('my-plugin-ribbon-class');
 
 		// Flomo Importer Command
 		this.addCommand({
 			id: 'open-flomo-importer',
 			name: 'Open Flomo Importer',
-			callback: () => {
+			callback: () => { 
 				importerUI.open();
 			},
 		});
 	}
 
-
+	
 	onunload() { }
 
 	async loadSettings() {
