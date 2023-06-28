@@ -14,8 +14,8 @@ export async function generateCanvas(app: App, flomo: Flomo, config: Record<stri
 
         for (const [idx, memo] of flomo.memos().entries()) {
             const _id: string = uuidv4();
-            const _x: number = (idx % 8) * 520; //  margin: 50px, length: 8n
-            const _y: number = (Math.floor(idx / 8)) * 520; //  margin: 50px
+            const _x: number = (idx % 8) * 520; //  margin: 20px, length: 8n
+            const _y: number = (Math.floor(idx / 8)) * 520; //  margin: 20px
 
             const content = (() => {
                 const res = memo["content"].replace(/!\[\]\(file\//gi, "![](flomo/");
