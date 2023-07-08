@@ -7,15 +7,22 @@ const canvasJson = {
     "edges": []
 }
 
+const canvasSize = {
+    "L": [500, 500],
+    "M": [300, 350],
+    "S": [230, 280]
+}
+
 export async function generateCanvas(app: App, flomo: Flomo, config: Record<string, string>): Promise<void> {
+    const size: number[] = canvasSize[config["canvasSize"]];
     if (flomo.stat["memo"] > 0) {
         const buffer: Record<string, string>[] = [];
         const canvas_file = `${config["flomoTarget"]}/Flomo Canvas.canvas`;
 
         for (const [idx, memo] of flomo.memos().entries()) {
             const _id: string = uuidv4();
-            const _x: number = (idx % 8) * 520; //  margin: 20px, length: 8n
-            const _y: number = (Math.floor(idx / 8)) * 520; //  margin: 20px
+            const _x: number = (idx % 8) * (size[0] + 20); //  margin: 20px, length: 8n
+            const _y: number = (Math.floor(idx / 8)) * (size[1] + 20); //  margin: 20px
 
             const content = (() => {
                 const res = memo["content"].replace(/!\[\]\(file\//gi, "![](flomo/");
@@ -33,8 +40,8 @@ export async function generateCanvas(app: App, flomo: Flomo, config: Record<stri
                         "id": _id,
                         "x": _x,
                         "y": _y,
-                        "width": 500,
-                        "height": 500
+                        "width": size[0],
+                        "height": size[1]
                     };
                 } else {
                     return {
@@ -43,8 +50,8 @@ export async function generateCanvas(app: App, flomo: Flomo, config: Record<stri
                         "id": _id,
                         "x": _x,
                         "y": _y,
-                        "width": 500,
-                        "height": 500
+                        "width": size[0],
+                        "height": size[1]
                     };
                 }
             })()

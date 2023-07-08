@@ -99,6 +99,47 @@ export class ImporterUI extends Modal {
                     })
             });
 
+        const canvsOptionBlock: HTMLDivElement = contentEl.createEl("div", { cls: "canvasOptionBlock" });
+        
+        const canvsOptionLabelL: HTMLLabelElement = canvsOptionBlock.createEl("label");
+        const canvsOptionLabelM: HTMLLabelElement = canvsOptionBlock.createEl("label");
+        const canvsOptionLabelS: HTMLLabelElement = canvsOptionBlock.createEl("label");
+        
+        const canvsSizeL: HTMLInputElement = canvsOptionLabelL.createEl("input", { type: "radio", cls: "ckbox" });
+        canvsOptionLabelL.createEl("small", { text: "large" });
+        const canvsSizeM: HTMLInputElement = canvsOptionLabelM.createEl("input", { type: "radio", cls: "ckbox" });
+        canvsOptionLabelM.createEl("small", { text: "medium" });
+        const canvsSizeS: HTMLInputElement = canvsOptionLabelS.createEl("input", { type: "radio", cls: "ckbox" });
+        canvsOptionLabelS.createEl("small", { text: "small" });
+        
+        canvsSizeL.name = "canvas_opt";
+        canvsSizeM.name = "canvas_opt";
+        canvsSizeS.name = "canvas_opt";
+
+        switch(this.plugin.settings.canvasSize){
+            case "L":
+                canvsSizeL.checked = true;
+                break
+            case "M":
+                canvsSizeM.checked = true;
+                break
+            case "S":
+                canvsSizeS.checked = true;
+                break
+        }
+
+        canvsSizeL.onchange = (ev) => {
+            this.plugin.settings.canvasSize = "L";
+        };
+
+        canvsSizeM.onchange = (ev) => {
+            this.plugin.settings.canvasSize = "M";
+        };
+
+        canvsSizeS.onchange = (ev) => {
+            this.plugin.settings.canvasSize = "S";
+        };
+
         new Setting(contentEl).setName('Experimental Options').setDesc('set experimental options')
 
         const expOptionBlock: HTMLDivElement = contentEl.createEl("div", { cls: "expOptionBlock" });

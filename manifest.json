@@ -1,7 +1,7 @@
 {
 	"id": "flomo-importer",
 	"name": "Flomo Importer",
-	"version": "1.1.0",
+	"version": "1.1.1",
 	"minAppVersion": "1.1.16",
 	"description": "Make Flomo Memos to Obsidian Notes",
 	"author": "Jialu Y",
