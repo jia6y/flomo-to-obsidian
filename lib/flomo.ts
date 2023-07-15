@@ -15,9 +15,9 @@ export class Flomo {
 
     private loadMemos(memoNodes: Array<HTMLElement>): Record<string, string>[] {
         const res: Record<string, string>[] = [];
-        const extrtactTitle = (item: string)  => { return item.replace(/(-|:|\s)/gi, "_") }
+        const extrtactTitle = (item: string) => { return item.replace(/(-|:|\s)/gi, "_") }
         const extractContent = (content: string) => {
-            return NodeHtmlMarkdown.translate(content).replace('\[','[').replace('\]',']')
+            return NodeHtmlMarkdown.translate(content).replace('\[', '[').replace('\]', ']')
         }
 
         memoNodes.forEach(i => {
@@ -25,21 +25,26 @@ export class Flomo {
             const dateTime = i.querySelector(".time").textContent;
             const title = extrtactTitle(dateTime);
             const content = extractContent(i.querySelector(".content").innerHTML) + "\n" +
-                            extractContent(i.querySelector(".files").innerHTML);
+                extractContent(i.querySelector(".files").innerHTML);
 
             res.push({
-                        "title": title,
-                        "date": dateTime.split(" ")[0],
-                        "content": "`" + dateTime + "`\n" + content,
-                    })
+                "title": title,
+                "date": dateTime.split(" ")[0],
+                "content": "`" + dateTime + "`\n" + content,
+            })
+
         });
+
         return res;
     }
 
     private loadTags(tagNodes: Array<HTMLElement>): string[] {
         const res: string[] = [];
-        tagNodes.slice(1).forEach( i => { res.push(i.textContent); })
+
+        tagNodes.slice(1).forEach(i => { res.push(i.textContent); })
+
         return res;
+
     }
 
 }
