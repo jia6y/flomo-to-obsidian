@@ -1,6 +1,6 @@
 {
   "name": "flomo-importer-plugin",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Make Flomo Memos to Obsidian Notes",
   "main": "main.js",
   "scripts": {
@@ -16,7 +16,7 @@
     "posttest": "npm run lint"
   },
   "keywords": [],
-  "author": "",
+  "author": "Jialu Y",
   "license": "MIT",
   "devDependencies": {
     "@types/adm-zip": "^0.5.0",
