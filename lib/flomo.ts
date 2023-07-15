@@ -30,7 +30,7 @@ export class Flomo {
             res.push({
                 "title": title,
                 "date": dateTime.split(" ")[0],
-                "content": "`" + dateTime + "`\n" + content,
+                "content": "`Created at " + dateTime + "`\n" + content,
             })
 
         });

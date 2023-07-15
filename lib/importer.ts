@@ -9,7 +9,6 @@ import { Flomo } from './flomo';
 import { generateMoments } from './obIntegration/moments';
 import { generateCanvas } from './obIntegration/canvas';
 
-
 const FLOMO_CACHE_LOC = path.join(os.homedir(), ".flomo/cache/");
 
 
@@ -78,7 +77,6 @@ export class FlomoImporter {
         // 2. unzip flomo_backup.zip to workspace
         const files = await decompress(this.config["rawDir"], tmpDir)
 
-
         // 3. copy attachments to ObVault
         const obVaultConfig = await fs.readJson(`${this.config["baseDir"]}/${this.app.vault.configDir}/app.json`)
         const attachementDir = obVaultConfig["attachmentFolderPath"] + "/flomo/";
@@ -98,7 +96,6 @@ export class FlomoImporter {
 
         const memos = await this.importMemos(flomo)
 
-
         // 5. Ob Intergations
         // If Generate Moments
         if (this.config["optionsMoments"] != "skip") {
@@ -114,6 +111,7 @@ export class FlomoImporter {
         await fs.remove(tmpDir);
 
         return flomo
+        
     }
 
 }
