@@ -28,7 +28,7 @@ export class ImporterUI extends Modal {
 
             const flomo = await (new FlomoImporter(this.app, config)).import();
 
-            new Notice(`🎉 Import Completed.\nTotal: ${flomo.stat["memo"].toString()} memos`)
+            new Notice(`🎉 Import Completed.\nTotal: ${flomo.memos.length} memos`)
             this.rawPath = "";
 
 
@@ -65,7 +65,7 @@ export class ImporterUI extends Modal {
                 }));
 
         new Setting(contentEl)
-            .setName('Memos Location')
+            .setName('Memo Location')
             .setDesc('set the location to store memos (under flomo root)')
             .addText((text) => text
                 .setPlaceholder('memos')
@@ -75,8 +75,8 @@ export class ImporterUI extends Modal {
                 }));
 
         new Setting(contentEl)
-            .setName('Moments Options')
-            .setDesc('set moments options')
+            .setName('Memo Options')
+            .setDesc('set memo options')
             .addDropdown((drp) => {
                 drp.addOption("copy_with_link", "Generate Moments")
                     .addOption("skip", "Skip Moments")
@@ -86,12 +86,24 @@ export class ImporterUI extends Modal {
                     })
             })
 
+        const momentOptionBlock: HTMLDivElement = contentEl.createEl("div", { cls: "canvasOptionBlock" });
+        const momentOptionLabel: HTMLLabelElement = momentOptionBlock.createEl("label");
+        const mergeByDate: HTMLInputElement = momentOptionLabel.createEl("input", { type: "checkbox", cls: "ckbox" })
+        mergeByDate.checked = this.plugin.settings.mergeByDate;
+        mergeByDate.onchange = (ev) => {
+            this.plugin.settings.mergeByDate = ev.currentTarget.checked;
+        };
+
+        momentOptionLabel.createEl("small", { text: "merge memos by date" });
+
+
+
         new Setting(contentEl)
             .setName('Canvas Options')
             .setDesc('set canvas options')
             .addDropdown((drp) => {
                 drp.addOption("copy_with_link", "Generate Canvas")
-                    .addOption("copy_with_content", "Generate Canvas with content")
+                    .addOption("copy_with_content", "Generate Canvas (with content)")
                     .addOption("skip", "Skip Canvas")
                     .setValue(this.plugin.settings.optionsCanvas)
                     .onChange(async (value) => {
@@ -150,7 +162,7 @@ export class ImporterUI extends Modal {
             this.plugin.settings.expOptionAllowbilink = ev.currentTarget.checked;
         };
 
-        expOptionLabel.createEl("small", { text: "Convert bidirectonal link: [[link]]" });
+        expOptionLabel.createEl("small", { text: "Convert bidirectonal link. example: [[abc]]" });
 
 
         new Setting(contentEl)

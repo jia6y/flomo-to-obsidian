@@ -14,7 +14,7 @@ const FLOMO_CACHE_LOC = path.join(os.homedir(), ".flomo/cache/");
 
 
 export class FlomoImporter {
-    private config: Record<string, string>;
+    private config: Record<string, any>;
     private app: App;
 
     constructor(app: App, config: Record<string, string>) {
@@ -29,27 +29,44 @@ export class FlomoImporter {
         return parse5.serialize(document);
     }
 
-    private async importMemos(flomo: Flomo): Promise<void> {
-        for (const [idx, memo] of flomo.memos().entries()) {
+    private async importMemos(flomo: Flomo): Promise<Flomo> {
+        const allowBilink: boolean = this.config["expOptionAllowbilink"];
+        const margeByDate: boolean = this.config["mergeByDate"];
+
+        for (const [idx, memo] of flomo.memos.entries()) {
 
             const memoSubDir = `${this.config["flomoTarget"]}/${this.config["memoTarget"]}/${memo["date"]}`;
-            const memoFilePath = `${memoSubDir}/memo@${memo["title"]}_${flomo.stat["memo"] - idx}.md`;
+            const memoFilePath = margeByDate ? `${memoSubDir}/memo@${memo["date"]}.md` : `${memoSubDir}/memo@${memo["title"]}_${flomo.memos.length - idx}.md`;
 
             await fs.mkdirp(`${this.config["baseDir"]}/${memoSubDir}`);
-
             const content = (() => {
                 const res = memo["content"].replace(/!\[\]\(file\//gi, "![](flomo/");
-                if (this.config["expOptionAllowbilink"] == true) {
+
+                if (allowBilink == true) {
                     return res.replace(`\\[\\[`, "[[").replace(`\\]\\]`, "]]")
                 }
+
                 return res;
+
             })();
 
+            if (!(memoFilePath in flomo.files)) {
+                flomo.files[memoFilePath] = []
+            }
+
+            flomo.files[memoFilePath].push(content);
+        }
+
+        console.log(flomo.files);
+
+        for (const filePath in flomo.files) {
             await this.app.vault.adapter.write(
-                `${memoFilePath}`,
-                content
+                filePath,
+                flomo.files[filePath].join("\n\n")
             );
         }
+
+        return flomo;
     }
 
     async import(): Promise<Flomo> {
@@ -79,7 +96,7 @@ export class FlomoImporter {
         const backupData = await this.sanitize(`${tmpDir}/${files[0].path}/index.html`)
         const flomo = new Flomo(backupData);
 
-        await this.importMemos(flomo)
+        const memos = await this.importMemos(flomo)
 
 
         // 5. Ob Intergations
@@ -90,7 +107,7 @@ export class FlomoImporter {
 
         // If Generate Canvas
         if (this.config["optionsCanvas"] != "skip") {
-            await generateCanvas(app, flomo, this.config);
+            await generateCanvas(app, memos, this.config);
         }
 
         // 6. Cleanup Workspace

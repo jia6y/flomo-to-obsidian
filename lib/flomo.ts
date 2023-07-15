@@ -1,39 +1,45 @@
 import { parse, HTMLElement } from 'node-html-parser';
 import { NodeHtmlMarkdown } from 'node-html-markdown';
 export class Flomo {
-    private memoNodes: Array<HTMLElement>;
-    private tagNodes: Array<HTMLElement>;
-    stat: Record<string, number>
+    memos: Record<string, string>[];
+    tags: string[];
+    files: Record<string, string[]>;
 
     constructor(flomoData: string) {
         const root = parse(flomoData);
-        this.memoNodes = root.querySelectorAll(".memo");
-        this.tagNodes = root.getElementById("tag").querySelectorAll("option");
-        this.stat = { "memo": this.memoNodes.length, "tag": this.tagNodes.length }
+        this.memos = this.loadMemos(root.querySelectorAll(".memo"));
+        this.tags = this.loadTags(root.getElementById("tag").querySelectorAll("option"));
+        this.files = {};
     }
 
-    memos(): Record<string, string>[] {
+
+    private loadMemos(memoNodes: Array<HTMLElement>): Record<string, string>[] {
         const res: Record<string, string>[] = [];
-        this.memoNodes.forEach(i => {
-            res.push({"title": (this.extrtactTitle(i.querySelector(".time").textContent)) as string,
-                      "date": (i.querySelector(".time").textContent.split(" ")[0]) as string,
-                      "content": `Created at:  ${this.extractContent(i.innerHTML)} \n\n`})
+        const extrtactTitle = (item: string)  => { return item.replace(/(-|:|\s)/gi, "_") }
+        const extractContent = (content: string) => {
+            return NodeHtmlMarkdown.translate(content).replace('\[','[').replace('\]',']')
+        }
+
+        memoNodes.forEach(i => {
+
+            const dateTime = i.querySelector(".time").textContent;
+            const title = extrtactTitle(dateTime);
+            const content = extractContent(i.querySelector(".content").innerHTML) + "\n" +
+                            extractContent(i.querySelector(".files").innerHTML);
+
+            res.push({
+                        "title": title,
+                        "date": dateTime.split(" ")[0],
+                        "content": "`" + dateTime + "`\n" + content,
+                    })
         });
         return res;
     }
 
-    tags(): string[] {
+    private loadTags(tagNodes: Array<HTMLElement>): string[] {
         const res: string[] = [];
-        this.tagNodes.slice(1).forEach(i => { res.push(i.textContent); })
+        tagNodes.slice(1).forEach( i => { res.push(i.textContent); })
         return res;
-    }
-
-    private extrtactTitle(item: string): string {
-        return item.replace(/(-|:|\s)/gi, "_")
-    }
-
-    private extractContent(content: string): string {
-        return NodeHtmlMarkdown.translate(content).replace('\[','[').replace('\]',']')
     }
 
 }

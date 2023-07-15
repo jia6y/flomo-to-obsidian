@@ -13,30 +13,26 @@ const canvasSize = {
     "S": [230, 280]
 }
 
-export async function generateCanvas(app: App, flomo: Flomo, config: Record<string, string>): Promise<void> {
-    const size: number[] = canvasSize[config["canvasSize"]];
-    if (flomo.stat["memo"] > 0) {
+export async function generateCanvas(app: App, flomo: Flomo, config: Record<string, any>): Promise<void> {
+    if (flomo.memos.length > 0) {
+        const size: number[] = canvasSize[config["canvasSize"]];
         const buffer: Record<string, string>[] = [];
-        const canvas_file = `${config["flomoTarget"]}/Flomo Canvas.canvas`;
+        const canvasFile = `${config["flomoTarget"]}/Flomo Canvas.canvas`;
+        const memoFiles = Object.keys(flomo.files);
 
-        for (const [idx, memo] of flomo.memos().entries()) {
+        for (const [idx, memoFile] of memoFiles.entries()) {
+                
             const _id: string = uuidv4();
             const _x: number = (idx % 8) * (size[0] + 20); //  margin: 20px, length: 8n
             const _y: number = (Math.floor(idx / 8)) * (size[1] + 20); //  margin: 20px
 
-            const content = (() => {
-                const res = memo["content"].replace(/!\[\]\(file\//gi, "![](flomo/");
-                if (config["expOptionAllowbilink"] == true) {
-                    return res.replace(`\\[\\[`, "[[").replace(`\\]\\]`, "]]")
-                }
-                return res;
-            })();
+            const content = flomo.files[memoFile];
 
             const canvasNode: Record<string, any> = (() => {
                 if (config["optionsCanvas"] == "copy_with_link") {
                     return {
                         "type": "file",
-                        "file": `${config["flomoTarget"]}/${config["memoTarget"]}/${memo["date"].split(" ")[0]}/memo@${memo["title"]}_${flomo.stat["memo"] - idx}.md`,
+                        "file": memoFile,
                         "id": _id,
                         "x": _x,
                         "y": _y,
@@ -46,7 +42,7 @@ export async function generateCanvas(app: App, flomo: Flomo, config: Record<stri
                 } else {
                     return {
                         "type": "text",
-                        "text": content,
+                        "text": content.join("\n\n"),
                         "id": _id,
                         "x": _x,
                         "y": _y,
@@ -60,6 +56,7 @@ export async function generateCanvas(app: App, flomo: Flomo, config: Record<stri
         };
 
         const canvasJson = { "nodes": buffer, "edges": [] }
-        await app.vault.adapter.write(canvas_file, JSON.stringify(canvasJson));
+        await app.vault.adapter.write(canvasFile, JSON.stringify(canvasJson));
+        
     }
 }
