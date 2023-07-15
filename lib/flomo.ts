@@ -12,8 +12,8 @@ export class Flomo {
         this.files = {};
     }
 
-
     private loadMemos(memoNodes: Array<HTMLElement>): Record<string, string>[] {
+        
         const res: Record<string, string>[] = [];
         const extrtactTitle = (item: string) => { return item.replace(/(-|:|\s)/gi, "_") }
         const extractContent = (content: string) => {
