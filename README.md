@@ -5,7 +5,8 @@
 Author: [Jialu Y](https://github.com/jia6y)
 <br />
 
-<img width="550" alt="image" src="https://github.com/jia6y/flomo-to-obsidian/assets/1456952/23386c5e-39e3-4200-8fcf-fb8e7cfa2776">
+<img width="638" alt="image" src="https://github.com/jia6y/flomo-to-obsidian/assets/1456952/5699f496-0a4c-401b-a8ee-967f07c28b32">
+
 <br />
 <br />
 
@@ -15,6 +16,7 @@ Author: [Jialu Y](https://github.com/jia6y)
 - Optional: Create `Flomo Canvas` (with content | file link)
 - Optional: Create `Flomo Moments`
 - Experimental: Support Bi-directional Links in memos
+- Experimental: Merge Memos by date
 
 <br />
 
