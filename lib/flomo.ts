@@ -13,7 +13,7 @@ export class Flomo {
     }
 
     private loadMemos(memoNodes: Array<HTMLElement>): Record<string, string>[] {
-        
+
         const res: Record<string, string>[] = [];
         const extrtactTitle = (item: string) => { return item.replace(/(-|:|\s)/gi, "_") }
         const extractContent = (content: string) => {
@@ -30,7 +30,7 @@ export class Flomo {
             res.push({
                 "title": title,
                 "date": dateTime.split(" ")[0],
-                "content": "`Created at " + dateTime + "`\n" + content,
+                "content": "`Created at " + dateTime + "`\n\n" + content,
             })
 
         });
