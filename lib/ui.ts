@@ -1,5 +1,6 @@
 import { App, Modal, Plugin, Setting, Notice } from 'obsidian';
 import { FlomoImporter } from './importer';
+import { createExpOpt } from './utils';
 
 
 export class ImporterUI extends Modal {
@@ -41,6 +42,7 @@ export class ImporterUI extends Modal {
     }
 
     onOpen() {
+
         const { contentEl } = this;
         contentEl.empty();
         contentEl.createEl("h3", { text: "Flomo Importer" });
@@ -75,8 +77,8 @@ export class ImporterUI extends Modal {
                 }));
 
         new Setting(contentEl)
-            .setName('Memo Options')
-            .setDesc('set memo options')
+            .setName('Moments Options')
+            .setDesc('set moments options')
             .addDropdown((drp) => {
                 drp.addOption("copy_with_link", "Generate Moments")
                     .addOption("skip", "Skip Moments")
@@ -85,18 +87,6 @@ export class ImporterUI extends Modal {
                         this.plugin.settings.optionsMoments = value;
                     })
             })
-
-        const momentOptionBlock: HTMLDivElement = contentEl.createEl("div", { cls: "canvasOptionBlock" });
-        const momentOptionLabel: HTMLLabelElement = momentOptionBlock.createEl("label");
-        const mergeByDate: HTMLInputElement = momentOptionLabel.createEl("input", { type: "checkbox", cls: "ckbox" })
-        mergeByDate.checked = this.plugin.settings.mergeByDate;
-        mergeByDate.onchange = (ev) => {
-            this.plugin.settings.mergeByDate = ev.currentTarget.checked;
-        };
-
-        momentOptionLabel.createEl("small", { text: "merge memos by date" });
-
-
 
         new Setting(contentEl)
             .setName('Canvas Options')
@@ -112,23 +102,23 @@ export class ImporterUI extends Modal {
             });
 
         const canvsOptionBlock: HTMLDivElement = contentEl.createEl("div", { cls: "canvasOptionBlock" });
-        
+
         const canvsOptionLabelL: HTMLLabelElement = canvsOptionBlock.createEl("label");
         const canvsOptionLabelM: HTMLLabelElement = canvsOptionBlock.createEl("label");
         const canvsOptionLabelS: HTMLLabelElement = canvsOptionBlock.createEl("label");
-        
+
         const canvsSizeL: HTMLInputElement = canvsOptionLabelL.createEl("input", { type: "radio", cls: "ckbox" });
         canvsOptionLabelL.createEl("small", { text: "large" });
         const canvsSizeM: HTMLInputElement = canvsOptionLabelM.createEl("input", { type: "radio", cls: "ckbox" });
         canvsOptionLabelM.createEl("small", { text: "medium" });
         const canvsSizeS: HTMLInputElement = canvsOptionLabelS.createEl("input", { type: "radio", cls: "ckbox" });
         canvsOptionLabelS.createEl("small", { text: "small" });
-        
+
         canvsSizeL.name = "canvas_opt";
         canvsSizeM.name = "canvas_opt";
         canvsSizeS.name = "canvas_opt";
 
-        switch(this.plugin.settings.canvasSize){
+        switch (this.plugin.settings.canvasSize) {
             case "L":
                 canvsSizeL.checked = true;
                 break
@@ -154,16 +144,19 @@ export class ImporterUI extends Modal {
 
         new Setting(contentEl).setName('Experimental Options').setDesc('set experimental options')
 
-        const expOptionBlock: HTMLDivElement = contentEl.createEl("div", { cls: "expOptionBlock" });
-        const expOptionLabel: HTMLLabelElement = expOptionBlock.createEl("label");
-        const allowBiLink: HTMLInputElement = expOptionLabel.createEl("input", { type: "checkbox", cls: "ckbox" })
+        const allowBiLink = createExpOpt(contentEl, "Convert bidirectonal link. example: [[abc]")
+        
         allowBiLink.checked = this.plugin.settings.expOptionAllowbilink;
         allowBiLink.onchange = (ev) => {
             this.plugin.settings.expOptionAllowbilink = ev.currentTarget.checked;
         };
 
-        expOptionLabel.createEl("small", { text: "Convert bidirectonal link. example: [[abc]]" });
-
+        const mergeByDate  = createExpOpt(contentEl, "Merge memos by date")
+        
+        mergeByDate.checked = this.plugin.settings.mergeByDate;
+        mergeByDate.onchange = (ev) => {
+            this.plugin.settings.mergeByDate = ev.currentTarget.checked;
+        };
 
         new Setting(contentEl)
             .addButton((btn) => {
@@ -188,6 +181,7 @@ export class ImporterUI extends Modal {
                         }
                     })
             });
+
     }
 
     onClose() {
