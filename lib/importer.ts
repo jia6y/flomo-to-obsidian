@@ -99,7 +99,7 @@ export class FlomoImporter {
         // 5. Ob Intergations
         // If Generate Moments
         if (this.config["optionsMoments"] != "skip") {
-            await generateMoments(app, flomo, this.config);
+            await generateMoments(app, memos, this.config);
         }
 
         // If Generate Canvas
