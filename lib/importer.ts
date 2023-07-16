@@ -56,8 +56,6 @@ export class FlomoImporter {
             flomo.files[memoFilePath].push(content);
         }
 
-        console.log(flomo.files);
-
         for (const filePath in flomo.files) {
             await this.app.vault.adapter.write(
                 filePath,
