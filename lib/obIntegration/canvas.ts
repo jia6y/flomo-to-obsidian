@@ -42,7 +42,7 @@ export async function generateCanvas(app: App, flomo: Flomo, config: Record<stri
                 } else {
                     return {
                         "type": "text",
-                        "text": content.join("\n\n"),
+                        "text": "**" + memoFile.split("@")[1] + "**\n\n" + content.join("\n\n---\n\n"),
                         "id": _id,
                         "x": _x,
                         "y": _y,
