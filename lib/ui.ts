@@ -144,7 +144,7 @@ export class ImporterUI extends Modal {
 
         new Setting(contentEl).setName('Experimental Options').setDesc('set experimental options')
 
-        const allowBiLink = createExpOpt(contentEl, "Convert bidirectonal link. example: [[abc]")
+        const allowBiLink = createExpOpt(contentEl, "Convert bidirectonal link. example: [[abc]]")
         
         allowBiLink.checked = this.plugin.settings.expOptionAllowbilink;
         allowBiLink.onchange = (ev) => {
