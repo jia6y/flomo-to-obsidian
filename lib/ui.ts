@@ -78,7 +78,7 @@ export class ImporterUI extends Modal {
 
         new Setting(contentEl)
             .setName('Moments Options')
-            .setDesc('set moments options')
+            .setDesc('set moments style: flow | skip')
             .addDropdown((drp) => {
                 drp.addOption("copy_with_link", "Generate Moments")
                     .addOption("skip", "Skip Moments")
@@ -90,7 +90,7 @@ export class ImporterUI extends Modal {
 
         new Setting(contentEl)
             .setName('Canvas Options')
-            .setDesc('set canvas options')
+            .setDesc('set canvas options: default(content) | link | skip')
             .addDropdown((drp) => {
                 drp.addOption("copy_with_link", "Generate Canvas")
                     .addOption("copy_with_content", "Generate Canvas (with content)")
