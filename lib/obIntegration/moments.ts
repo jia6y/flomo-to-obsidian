@@ -9,14 +9,14 @@ export async function generateMoments(app: App, flomo: Flomo, config: Record<str
         const index_file = `${config["flomoTarget"]}/Flomo Moments.md`;
         const memoFiles = Object.keys(flomo.files);
 
-        buffer.push(`updated at: ${(new Date()).toLocaleString()}\n\n`);
+        //buffer.push(`updated at: ${(new Date()).toLocaleString()}\n\n`);
 
-        for (const tag of flomo.tags) { tags.push(`#${tag}`);};
+        for (const tag of flomo.tags) { tags.push(`${tag}`);};
 
-        buffer.push(tags.join(' ') + "\n\n---\n\n");
+        buffer.push(`---\ncreatedDate: ${(new Date()).toLocaleString().split(' ')[0]}\ntags:\n  - ${tags.join("\n  - ")}\n---\n`);
 
         for (const [idx, memoFile] of memoFiles.entries()) {
-            buffer.push(`![[${memoFile}]]\n\n---\n\n`);
+            buffer.push(`![[${memoFile}]]\n\n---\n`);
         };
 
         await app.vault.adapter.write(index_file, buffer.join("\n"));

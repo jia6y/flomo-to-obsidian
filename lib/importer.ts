@@ -39,7 +39,10 @@ export class FlomoImporter {
 
             await fs.mkdirp(`${this.config["baseDir"]}/${memoSubDir}`);
             const content = (() => {
-                const res = memo["content"].replace(/!\[\]\(file\//gi, "![](flomo/");
+                //const res = memo["content"].replace(/!\[\]\(file\//gi, "\n![](flomo/");
+                //const res = memo["content"].replace(`<!-- -->`, '')
+                //                           .replace(/!\[null\]\(<file\//gi, "\n![](<flomo/");;
+                const res = memo["content"];
 
                 if (allowBilink == true) {
                     return res.replace(`\\[\\[`, "[[").replace(`\\]\\]`, "]]")
@@ -100,10 +103,12 @@ export class FlomoImporter {
             await generateMoments(app, memos, this.config);
         }
 
+        
         // If Generate Canvas
         if (this.config["optionsCanvas"] != "skip") {
             await generateCanvas(app, memos, this.config);
         }
+    
 
         // 6. Cleanup Workspace
         await fs.remove(tmpDir);
