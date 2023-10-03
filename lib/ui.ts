@@ -68,7 +68,7 @@ export class ImporterUI extends Modal {
 
         new Setting(contentEl)
             .setName('Memo Location')
-            .setDesc('set the location to store memos (under flomo root)')
+            .setDesc('set the location to store memos (under Flomo Root)')
             .addText((text) => text
                 .setPlaceholder('memos')
                 .setValue(this.plugin.settings.memoTarget)
@@ -78,7 +78,7 @@ export class ImporterUI extends Modal {
 
         new Setting(contentEl)
             .setName('Moments Options')
-            .setDesc('set moments style: flow | skip')
+            .setDesc('set moments style: flow(default) | skip')
             .addDropdown((drp) => {
                 drp.addOption("copy_with_link", "Generate Moments")
                     .addOption("skip", "Skip Moments")
@@ -90,7 +90,7 @@ export class ImporterUI extends Modal {
 
         new Setting(contentEl)
             .setName('Canvas Options')
-            .setDesc('set canvas options: default(content) | link | skip')
+            .setDesc('set canvas options: link | content(default) | skip')
             .addDropdown((drp) => {
                 drp.addOption("copy_with_link", "Generate Canvas")
                     .addOption("copy_with_content", "Generate Canvas (with content)")

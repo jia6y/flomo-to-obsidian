@@ -1,11 +1,15 @@
 import { parse, HTMLElement } from 'node-html-parser';
-import { NodeHtmlMarkdown } from 'node-html-markdown';
+//import { NodeHtmlMarkdown} from 'node-html-markdown';
+//import DOMPurify from 'dompurify';
+import showdown from 'showdown';
+
 export class Flomo {
     memos: Record<string, string>[];
     tags: string[];
     files: Record<string, string[]>;
 
     constructor(flomoData: string) {
+        //const root = parse(DOMPurify.sanitize(flomoData));
         const root = parse(flomoData);
         this.memos = this.loadMemos(root.querySelectorAll(".memo"));
         this.tags = this.loadTags(root.getElementById("tag").querySelectorAll("option"));
@@ -17,7 +21,14 @@ export class Flomo {
         const res: Record<string, string>[] = [];
         const extrtactTitle = (item: string) => { return item.replace(/(-|:|\s)/gi, "_") }
         const extractContent = (content: string) => {
-            return NodeHtmlMarkdown.translate(content).replace('\[', '[').replace('\]', ']')
+            //return NodeHtmlMarkdown.translate(content, {bulletMarker: '-',}).replace('\[', '[').replace('\]', ']')
+            return (new showdown.Converter({metadata: false})).makeMarkdown(content)
+                                        .replace(/\\\[/g, '[')
+                                        .replace(/\\\]/g, ']')
+                                        .replace(/\\#/g, '#')
+                                        .replace(/\<\!--\s--\>/g, '')
+                                        .replace(/^\s*[\r\n]/gm,'')
+                                        .replace(/!\[null\]\(<file\//gi, "\n![](<flomo/");
         }
 
         memoNodes.forEach(i => {
@@ -30,7 +41,7 @@ export class Flomo {
             res.push({
                 "title": title,
                 "date": dateTime.split(" ")[0],
-                "content": "`Created at " + dateTime + "`\n\n" + content,
+                "content": "`📅 " + dateTime + "`\n\n" + content,
             })
 
         });
