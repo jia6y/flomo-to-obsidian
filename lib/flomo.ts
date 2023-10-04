@@ -1,7 +1,6 @@
 import { parse, HTMLElement } from 'node-html-parser';
 //import { NodeHtmlMarkdown} from 'node-html-markdown';
-//import DOMPurify from 'dompurify';
-import showdown from 'showdown';
+import turndown from 'turndown';
 
 export class Flomo {
     memos: Record<string, string>[];
@@ -22,13 +21,17 @@ export class Flomo {
         const extrtactTitle = (item: string) => { return item.replace(/(-|:|\s)/gi, "_") }
         const extractContent = (content: string) => {
             //return NodeHtmlMarkdown.translate(content, {bulletMarker: '-',}).replace('\[', '[').replace('\]', ']')
-            return (new showdown.Converter({metadata: false})).makeMarkdown(content)
+            //return NodeHtmlMarkdown.translate(content, {bulletMarker: '-',}).replace('\[', '[').replace('\]', ']')
+            //return (new showdown.Converter({metadata: false})).makeMarkdown(content)
+            //return NodeHtmlMarkdown.translate(content, {bulletMarker: '-'})
+            return (new turndown()).turndown(content)
                                         .replace(/\\\[/g, '[')
                                         .replace(/\\\]/g, ']')
-                                        .replace(/\\#/g, '#')
-                                        .replace(/\<\!--\s--\>/g, '')
-                                        .replace(/^\s*[\r\n]/gm,'')
-                                        .replace(/!\[null\]\(<file\//gi, "\n![](<flomo/");
+                                        //replace(/\\#/g, '#')
+                                        .replace(/!\[\]\(file\//gi, "\n![](flomo/")
+                                        //.replace(/\<\!--\s--\>/g, '')
+                                        //.replace(/^\s*[\r\n]/gm,'')
+                                        //.replace(/!\[null\]\(<file\//gi, "\n![](<flomo/");
         }
 
         memoNodes.forEach(i => {
@@ -58,4 +61,5 @@ export class Flomo {
 
     }
 
+    
 }
