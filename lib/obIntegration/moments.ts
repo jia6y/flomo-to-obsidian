@@ -1,5 +1,5 @@
 import { App } from 'obsidian';
-import { Flomo } from '../flomo/flomo_core';
+import { Flomo } from '../flomo/core';
 
 
 export async function generateMoments(app: App, flomo: Flomo, config: Record<string, any>): Promise<void> {
