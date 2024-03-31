@@ -151,12 +151,21 @@ export class ImporterUI extends Modal {
             this.plugin.settings.expOptionAllowbilink = ev.currentTarget.checked;
         };
 
+        const convertTagToBiLink  = createExpOpt(contentEl, "Covert tags to bidirectonal link. example: #abc -> [[abc]]")
+        
+        convertTagToBiLink.checked = this.plugin.settings.convertTagToBiLink;
+        convertTagToBiLink.onchange = (ev) => {
+            this.plugin.settings.mergeByDate = ev.currentTarget.checked;
+        };
+
         const mergeByDate  = createExpOpt(contentEl, "Merge memos by date")
         
         mergeByDate.checked = this.plugin.settings.mergeByDate;
         mergeByDate.onchange = (ev) => {
             this.plugin.settings.mergeByDate = ev.currentTarget.checked;
         };
+
+        
 
         new Setting(contentEl)
             .addButton((btn) => {

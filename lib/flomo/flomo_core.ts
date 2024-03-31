@@ -1,8 +1,9 @@
 import { parse, HTMLElement } from 'node-html-parser';
 //import { NodeHtmlMarkdown} from 'node-html-markdown';
 import turndown from 'turndown';
+import DOMPurify from 'dompurify';
 
-export class Flomo {
+export class FlomoCore {
     memos: Record<string, string>[];
     tags: string[];
     files: Record<string, string[]>;
@@ -24,11 +25,42 @@ export class Flomo {
             //return NodeHtmlMarkdown.translate(content, {bulletMarker: '-',}).replace('\[', '[').replace('\]', ']')
             //return (new showdown.Converter({metadata: false})).makeMarkdown(content)
             //return NodeHtmlMarkdown.translate(content, {bulletMarker: '-'})
-            return (new turndown()).turndown(content)
-                                        .replace(/\\\[/g, '[')
-                                        .replace(/\\\]/g, ']')
+            const td = new turndown({bulletListMarker: '-'});
+            //const p_rule = {
+            //    filter: 'p',
+            //    replacement: function (content) {
+            //      return '\n' + content + '\n'
+            //    }
+            //  }
+            const liRule = {
+                filter: 'li',
+              
+                replacement: function (content, node, options) {
+                  content = content
+                    .replace(/^\n+/, '') // remove leading newlines
+                    .replace(/\n+$/, '\n') // replace trailing newlines with just a single one
+                    .replace(/\n/gm, '\n    ') // indent
+                    //.replace(/\<p\>/gi, '')
+                    //.replace(/\<\/p\>/gi, '')
+                  var prefix = options.bulletListMarker + ' '
+                  var parent = node.parentNode
+                  if (parent.nodeName === 'OL') {
+                    var start = parent.getAttribute('start')
+                    var index = Array.prototype.indexOf.call(parent.children, node)
+                    prefix = (start ? Number(start) + index : index + 1) + '.  '
+                  }
+                  return (
+                    prefix + content + (node.nextSibling && !/\n$/.test(content) ? '\n' : '')
+                  )
+                }
+              }
+              
+            td.addRule('listItem', liRule);
+
+            return td.turndown(content).replace(/\\\[/g, '[')
+                                       .replace(/\\\]/g, ']')
                                         //replace(/\\#/g, '#')
-                                        .replace(/!\[\]\(file\//gi, "\n![](flomo/")
+                                       .replace(/!\[\]\(file\//gi, "\n![](flomo/")
                                         //.replace(/\<\!--\s--\>/g, '')
                                         //.replace(/^\s*[\r\n]/gm,'')
                                         //.replace(/!\[null\]\(<file\//gi, "\n![](<flomo/");
@@ -44,7 +76,7 @@ export class Flomo {
             res.push({
                 "title": title,
                 "date": dateTime.split(" ")[0],
-                "content": "`📅 " + dateTime + "`\n\n" + content,
+                "content": "📅 [[" + dateTime.split(" ")[0] + "]]"+ " " + dateTime.split(" ")[1] + "\n\n" + content,
             })
 
         });
@@ -61,5 +93,5 @@ export class Flomo {
 
     }
 
-    
+
 }

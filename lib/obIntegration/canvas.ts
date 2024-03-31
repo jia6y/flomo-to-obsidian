@@ -1,6 +1,6 @@
 import { App } from 'obsidian';
 import { v4 as uuidv4 } from 'uuid';
-import { Flomo } from '../flomo';
+import { Flomo } from '../flomo/flomo_core';
 
 const canvasJson = {
     "nodes": [],

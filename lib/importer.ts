@@ -5,11 +5,11 @@ import *  as fs from 'fs-extra';
 import { App } from 'obsidian';
 import decompress from 'decompress';
 import * as parse5 from "parse5"
-import { Flomo } from './flomo';
+import { FlomoCore } from './flomo/flomo_core';
 import { generateMoments } from './obIntegration/moments';
 import { generateCanvas } from './obIntegration/canvas';
 
-const FLOMO_CACHE_LOC = path.join(os.homedir(), ".flomo/cache/");
+const FLOMO_CACHE_LOC = path.join(os.homedir(), "/.flomo/cache/");
 
 
 export class FlomoImporter {
@@ -28,7 +28,7 @@ export class FlomoImporter {
         return parse5.serialize(document);
     }
 
-    private async importMemos(flomo: Flomo): Promise<Flomo> {
+    private async importMemos(flomo: FlomoCore): Promise<FlomoCore> {
         const allowBilink: boolean = this.config["expOptionAllowbilink"];
         const margeByDate: boolean = this.config["mergeByDate"];
 
@@ -62,14 +62,14 @@ export class FlomoImporter {
         for (const filePath in flomo.files) {
             await this.app.vault.adapter.write(
                 filePath,
-                flomo.files[filePath].join("\n\n")
+                flomo.files[filePath].join("\n\n---\n\n")
             );
         }
 
         return flomo;
     }
 
-    async import(): Promise<Flomo> {
+    async import(): Promise<FlomoCore> {
 
         // 1. create workspace
         const tmpDir = path.join(FLOMO_CACHE_LOC, "data")
@@ -92,10 +92,13 @@ export class FlomoImporter {
         }
 
         // 4. import Memos
-        const backupData = await this.sanitize(`${tmpDir}/${files[0].path}/index.html`)
-        const flomo = new Flomo(backupData);
+        // @Mar-31, 2024 Fix: #21 - Update default page from index.html to <userid>.html
+        const default_page = (await fs.readdir(`${tmpDir}/${files[0].path}`)).filter((fn,_idx,fn_array) => fn.endsWith('.html'))[0];
+        console.log(`******${tmpDir}/${files[0].path}/${default_page}*****`)
+        const dataExport= await this.sanitize(`${tmpDir}/${files[0].path}/${default_page}`);
+        const flomo = new FlomoCore(dataExport);
 
-        const memos = await this.importMemos(flomo)
+        const memos = await this.importMemos(flomo);
 
         // 5. Ob Intergations
         // If Generate Moments

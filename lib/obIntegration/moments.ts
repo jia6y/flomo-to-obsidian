@@ -1,5 +1,5 @@
 import { App } from 'obsidian';
-import { Flomo } from '../flomo';
+import { Flomo } from '../flomo/flomo_core';
 
 
 export async function generateMoments(app: App, flomo: Flomo, config: Record<string, any>): Promise<void> {
@@ -11,7 +11,7 @@ export async function generateMoments(app: App, flomo: Flomo, config: Record<str
 
         //buffer.push(`updated at: ${(new Date()).toLocaleString()}\n\n`);
 
-        for (const tag of flomo.tags) { tags.push(`${tag}`);};
+        for (const tag of flomo.tags) { tags.push(`"${tag}"`);};
 
         buffer.push(`---\ncreatedDate: ${(new Date()).toLocaleString().split(' ')[0]}\ntags:\n  - ${tags.join("\n  - ")}\n---\n`);
 
