@@ -67,11 +67,14 @@ export class FlomoCore {
         }
 
         memoNodes.forEach(i => {
-
             const dateTime = i.querySelector(".time").textContent;
             const title = extrtactTitle(dateTime);
-            const content = extractContent(i.querySelector(".content").innerHTML) + "\n" +
-                extractContent(i.querySelector(".files").innerHTML);
+
+            // @Mar-31, 2024 Fix: #20 - Support <mark>.*?<mark/>
+            const contentBody = i.querySelector(".content").innerHTML.replaceAll("<mark>", "FLOMOIMPORTERHIGHLIGHTMARKPLACEHOLDER").replaceAll("</mark>", "FLOMOIMPORTERHIGHLIGHTMARKPLACEHOLDER");
+            const contentFile = i.querySelector(".files").innerHTML
+
+            const content = extractContent(contentBody) + "\n" + extractContent(contentFile);
 
             res.push({
                 "title": title,

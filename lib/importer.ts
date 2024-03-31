@@ -39,11 +39,12 @@ export class FlomoImporter {
 
             await fs.mkdirp(`${this.config["baseDir"]}/${memoSubDir}`);
             const content = (() => {
-                //const res = memo["content"].replace(/!\[\]\(file\//gi, "\n![](flomo/");
-                //const res = memo["content"].replace(`<!-- -->`, '')
-                //                           .replace(/!\[null\]\(<file\//gi, "\n![](<flomo/");;
-                const res = memo["content"];
-
+                // @Mar-31, 2024 Fix: #20 - Support <mark>.*?<mark/>
+                // Break it into 2 stage, too avoid "==" translating to "\=="
+                //  1. Replace <mark> & </mark> with FLOMOIMPORTERHIGHLIGHTMARKPLACEHOLDER (in lib/flomo/flomo_core.ts)
+                //  2. Replace FLOMOIMPORTERHIGHLIGHTMARKPLACEHOLDER to ==
+                const res = memo["content"].replaceAll("FLOMOIMPORTERHIGHLIGHTMARKPLACEHOLDER", "==");
+                
                 if (allowBilink == true) {
                     return res.replace(`\\[\\[`, "[[").replace(`\\]\\]`, "]]")
                 }
@@ -93,9 +94,8 @@ export class FlomoImporter {
 
         // 4. import Memos
         // @Mar-31, 2024 Fix: #21 - Update default page from index.html to <userid>.html
-        const default_page = (await fs.readdir(`${tmpDir}/${files[0].path}`)).filter((fn,_idx,fn_array) => fn.endsWith('.html'))[0];
-        console.log(`******${tmpDir}/${files[0].path}/${default_page}*****`)
-        const dataExport= await this.sanitize(`${tmpDir}/${files[0].path}/${default_page}`);
+        const defaultPage = (await fs.readdir(`${tmpDir}/${files[0].path}`)).filter((fn,_idx,fn_array) => fn.endsWith('.html'))[0];
+        const dataExport= await this.sanitize(`${tmpDir}/${files[0].path}/${defaultPage}`);
         const flomo = new FlomoCore(dataExport);
 
         const memos = await this.importMemos(flomo);
