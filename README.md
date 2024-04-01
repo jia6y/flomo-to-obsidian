@@ -2,9 +2,8 @@
 
 ##### ☕️ Make Flomo Memos to Obsidian Notes.
 
-Author: [Jialu Y](https://github.com/jia6y)
-<br />
-Disucssion: [Disucssion](https://github.com/jia6y/flomo-to-obsidian/discussions)
+- Author: [Jialu Y](https://github.com/jia6y)
+- isucssion: [Disucssion](https://github.com/jia6y/flomo-to-obsidian/discussions)
 <br />
 
 <img width="500" alt="image" src="https://github.com/jia6y/flomo-to-obsidian/assets/1456952/bbbf6658-b93e-4b81-b087-0dd8687958ad">
@@ -33,7 +32,7 @@ Disucssion: [Disucssion](https://github.com/jia6y/flomo-to-obsidian/discussions)
 ### First time to use it?
 
 #### Install Dependency
-  - Playwright
+  - Playwright (nice to have)
 
 #### Install And Enable the plugin
   - Install `Flomo Importer` and enable it.

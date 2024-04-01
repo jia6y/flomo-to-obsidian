@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as os from 'os';
 import *  as fs from 'fs-extra';
-import * as playwright from 'playwright';
+import * as playwright_core from 'playwright-core';
 
 import { AUTH_FILE, FLOMO_PLAYWRIGHT_CACHE_LOC } from './const'
 
@@ -14,8 +14,8 @@ export class FlomoAuth{
     async auth(uid: string, passwd: string): Promise<[boolean, string]> {
         try {
             // Setup
-            const browser = await playwright.chromium.launch();
-            const context = await browser.newContext(playwright.devices['Desktop Chrome']);
+            const browser = await playwright_core.webkit.launch();
+            const context = await browser.newContext(playwright_core.devices['Desktop Chrome']);
             const page = await context.newPage();
             
             await page.goto('https://v.flomoapp.com/login');
