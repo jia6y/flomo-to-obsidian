@@ -33,7 +33,7 @@ Author: [Jialu Y](https://github.com/jia6y)
 #### Install Dependency
   - Playwright
 
-#### Install  Enable
+#### Install And Enable the plugin
   - Install `Flomo Importer` and enable it.
     
     <img width="230" alt="image" src="https://github.com/jia6y/flomo-to-obsidian/assets/1456952/011df0bc-1332-4e18-8500-4f244737c118">
