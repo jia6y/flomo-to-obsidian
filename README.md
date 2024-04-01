@@ -4,6 +4,8 @@
 
 Author: [Jialu Y](https://github.com/jia6y)
 <br />
+Disucssion: [Disucssion](https://github.com/jia6y/flomo-to-obsidian/discussions)
+<br />
 
 <img width="500" alt="image" src="https://github.com/jia6y/flomo-to-obsidian/assets/1456952/bbbf6658-b93e-4b81-b087-0dd8687958ad">
 
