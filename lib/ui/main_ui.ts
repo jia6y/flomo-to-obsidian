@@ -232,7 +232,7 @@ export class MainUI extends Modal {
                         await this.onSync(btn);
                         //this.close();
                     })
-            });
+            });   
 
     }
 

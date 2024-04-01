@@ -30,6 +30,9 @@ Author: [Jialu Y](https://github.com/jia6y)
 
 ### First time to use it?
 
+#### Install Dependency
+  - Playwright
+
 #### Install  Enable
   - Install `Flomo Importer` and enable it.
     

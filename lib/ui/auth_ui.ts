@@ -20,11 +20,11 @@ export class AuthUI extends Modal {
 
         const { contentEl } = this;
         contentEl.empty();
-        contentEl.createEl("h3", { text: "Authentication" });
+        contentEl.createEl("h3", { text: "Connecting to Flomo" });
 
         new Setting(contentEl)
-            .setName('Flomo Login')
-            .setDesc("enter your credential")
+            .setName('Flomo Signin')
+            .setDesc("enter your flomo credential")
             .addText(text => text
                 .setPlaceholder('Your userid')
                 .onChange(async (value) => {

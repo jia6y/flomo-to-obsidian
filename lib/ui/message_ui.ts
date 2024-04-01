@@ -1,5 +1,4 @@
 import { App, Modal, Plugin, Setting, Notice } from 'obsidian';
-import { createExpOpt } from './common';
 
 
 export class MessageUI extends Modal {
