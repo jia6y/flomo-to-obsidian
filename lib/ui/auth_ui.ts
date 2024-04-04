@@ -39,6 +39,7 @@ export class AuthUI extends Modal {
 
 
         new Setting(contentEl)
+            .setDesc("Prerequisite: npx playwright install")
             .addButton((btn) => {
                 btn.setButtonText("Cancel")
                     .setCta()
