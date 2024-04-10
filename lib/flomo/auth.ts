@@ -14,7 +14,7 @@ export class FlomoAuth{
     async auth(uid: string, passwd: string): Promise<[boolean, string]> {
         try {
             // Setup
-            const browser = await playwright_core.webkit.launch();
+            const browser = await playwright_core.chromium.launch();
             const context = await browser.newContext(playwright_core.devices['Desktop Chrome']);
             const page = await context.newPage();
             

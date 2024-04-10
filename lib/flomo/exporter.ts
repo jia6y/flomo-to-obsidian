@@ -9,7 +9,7 @@ export class FlomoExporter {
     async export(): Promise<[boolean, string]> {
         try {
             // Setup
-            const browser = await playwright_core.webkit.launch();
+            const browser = await playwright_core.chromium.launch();
             
             const context = await browser.newContext({ storageState: AUTH_FILE });
             const page = await context.newPage();

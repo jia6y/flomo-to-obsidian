@@ -41,7 +41,7 @@ export default class FlomoImporterPlugin extends Plugin {
 			id: 'open-flomo-importer',
 			name: 'Open Flomo Importer',
 			callback: () => { 
-				importerUI.open();
+				mainUI.open();
 			},
 		});
 	}
