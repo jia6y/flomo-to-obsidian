@@ -1,6 +1,6 @@
 import { App } from 'obsidian';
 import { v4 as uuidv4 } from 'uuid';
-import { Flomo } from '../flomo/core';
+import { FlomoCore } from '../flomo/core';
 
 const canvasJson = {
     "nodes": [],
@@ -13,7 +13,7 @@ const canvasSize = {
     "S": [230, 280]
 }
 
-export async function generateCanvas(app: App, flomo: Flomo, config: Record<string, any>): Promise<void> {
+export async function generateCanvas(app: App, flomo: FlomoCore, config: Record<string, any>): Promise<void> {
     if (flomo.memos.length > 0) {
         const size: number[] = canvasSize[config["canvasSize"]];
         const buffer: Record<string, string>[] = [];

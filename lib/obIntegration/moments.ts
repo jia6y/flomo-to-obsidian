@@ -1,8 +1,8 @@
 import { App } from 'obsidian';
-import { Flomo } from '../flomo/core';
+import { FlomoCore } from '../flomo/core';
 
 
-export async function generateMoments(app: App, flomo: Flomo, config: Record<string, any>): Promise<void> {
+export async function generateMoments(app: App, flomo: FlomoCore, config: Record<string, any>): Promise<void> {
     if (flomo.memos.length > 0) {
         const buffer: string[] = [];
         const tags: string[] = [];
