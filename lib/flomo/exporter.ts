@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as os from 'os';
 import *  as fs from 'fs-extra';
-import * as playwright_core from 'playwright-core';
+import * as playwright from 'playwright';
 
 import { DOWNLOAD_FILE, AUTH_FILE } from './const'
 
@@ -9,7 +9,7 @@ export class FlomoExporter {
     async export(): Promise<[boolean, string]> {
         try {
             // Setup
-            const browser = await playwright_core.chromium.launch();
+            const browser = await playwright.chromium.launch();
             
             const context = await browser.newContext({ storageState: AUTH_FILE });
             const page = await context.newPage();
