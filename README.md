@@ -36,9 +36,8 @@
 
 #### Install And Enable the plugin
   - Install `Flomo Importer` and enable it.
-    
-    <img width="230" alt="image" src="https://github.com/jia6y/flomo-to-obsidian/assets/1456952/011df0bc-1332-4e18-8500-4f244737c118">
 
+    <img width="225" alt="image" src="https://github.com/jia6y/flomo-to-obsidian/assets/1456952/88cff082-e33f-4671-ba24-7059c6bbce88">
   
   - Use the command `Open Flomo Importer`, or use `Import Button`
     
@@ -47,11 +46,11 @@
 #### Auto Sync
   - Click on "Auto Sync"
 
-    <img width="500" alt="image" src="https://github.com/jia6y/flomo-to-obsidian/assets/1456952/71af02c3-9c14-4eec-b56f-d6207178ccd5">
+    <img width="350" alt="image" src="https://github.com/jia6y/flomo-to-obsidian/assets/1456952/71af02c3-9c14-4eec-b56f-d6207178ccd5">
 
   - Authentication is required if first time to sync or the current signin expired.
 
-    <img width="500" alt="image" src="https://github.com/jia6y/flomo-to-obsidian/assets/1456952/7754586a-e9e2-40b7-93c1-0dbcc0631a1e">
+    <img width="350" alt="image" src="https://github.com/jia6y/flomo-to-obsidian/assets/1456952/7754586a-e9e2-40b7-93c1-0dbcc0631a1e">
 
   - Exporting & Importing
 
@@ -89,4 +88,5 @@ Please feel free to reach out to me or log an Issue here if there are any questi
 
 ### Buy me a coffee ☕️
 
-<img src="https://raw.githubusercontent.com/jia6y/flomo-to-obsidian/main/assets/buy_me_a_coffee.jpeg" width="230">
+<img width="275" alt="image" src="https://github.com/jia6y/flomo-to-obsidian/assets/1456952/71f2673d-6cc3-4f4e-84a2-c88f94ecd6d9">
+
