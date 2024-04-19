@@ -3,7 +3,7 @@
 ##### ☕️ Make Flomo Memos to Obsidian Notes.
 
 - Author: [Jialu Y](https://github.com/jia6y)
-- Disucssion: [Disucssion](https://github.com/jia6y/flomo-to-obsidian/discussions)
+- Discussion: [Disucssion](https://github.com/jia6y/flomo-to-obsidian/discussions)
 <br />
 
 <img width="500" alt="image" src="https://github.com/jia6y/flomo-to-obsidian/assets/1456952/bbbf6658-b93e-4b81-b087-0dd8687958ad">
@@ -48,7 +48,7 @@
 
     <img width="350" alt="image" src="https://github.com/jia6y/flomo-to-obsidian/assets/1456952/71af02c3-9c14-4eec-b56f-d6207178ccd5">
 
-  - Authentication is required if first time to sync or the current signin expired.
+  - Authentication is required if the first time syncs or the current sign-in expires.
 
     <img width="350" alt="image" src="https://github.com/jia6y/flomo-to-obsidian/assets/1456952/7754586a-e9e2-40b7-93c1-0dbcc0631a1e">
 
@@ -60,7 +60,7 @@
 
 #### Adhoc Sync
 
-###### 2.1. 📦 **Export from Flomo**
+###### 📦 **Export from Flomo**
   - Go to `Account Details` 
   - Select `Export All (as HTML)`
     
@@ -68,7 +68,7 @@
 
   - Click on `Start to export`
 
-###### 2.2 🎯 **Import to Obsidian**
+###### 🎯 **Import to Obsidian**
 
   - Choose flomo.zip to Import. The `Flomo & Memo Home` is where to store your memos.
 
@@ -82,7 +82,9 @@
 <br />
 
 ### Support 🧑🏻‍💻
-Please feel free to reach out to me or log an Issue here if there are any questions. :)
+Please feel free to reach out to me or log an Issue here if there are any questions. :)  
+<br />
+[Disucssion](https://github.com/jia6y/flomo-to-obsidian/discussions)
 
 <br />
 
