@@ -32,7 +32,8 @@
 ### First time to use it?
 
 #### Install Dependency
-  - **Playwright (MUST HAVE) :** `npx playwright install`
+  - **Playwright (MUST HAVE) :** `npx playwright@1.43.1 install`
+  - (this plugin was pre-built with version 1.43.1)
 
 #### Install And Enable the plugin
   - Install `Flomo Importer` and enable it.
