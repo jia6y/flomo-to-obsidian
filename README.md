@@ -91,5 +91,7 @@ Please feel free to reach out to me or log an Issue here if there are any questi
 
 ### Buy me a coffee ☕️
 
-<img width="275" alt="image" src="https://github.com/jia6y/flomo-to-obsidian/assets/1456952/71f2673d-6cc3-4f4e-84a2-c88f94ecd6d9">
+<img width="224" alt="image" src="https://github.com/user-attachments/assets/9eb7c52f-6d82-4677-888c-a6b1eb632470">
+
+
 
