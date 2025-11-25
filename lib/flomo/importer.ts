@@ -95,9 +95,42 @@ export class FlomoImporter {
         }
 
         // 4. Import Memos
-        // @Mar-31, 2024 Fix: #21 - Update default page from index.html to <userid>.html
-        const defaultPage = (await fs.readdir(`${tmpDir}/${files[0].path}`)).filter((fn, _idx, fn_array) => fn.endsWith('.html'))[0];
-        const dataExport = await this.sanitize(`${tmpDir}/${files[0].path}/${defaultPage}`);
+        // Fix for newer flomo export structure: Handle directory name changes and find HTML file
+        let rootDir = files[0].path;
+
+        // Handle both old and new flomo export structures
+        // New structure: flomo@username-date/
+        // Old structure: userid/
+
+        // Ensure we're working with the root directory
+        // Handle both old and new flomo export structures
+        if (files.some(f => f.path.endsWith('/file/') || f.path.includes('@'))) {
+            // New flomo export structure detected
+            const rootDirFiles = files.filter(f => f.path.includes('@') && f.path.includes('/'));
+            if (rootDirFiles.length > 0) {
+                rootDir = rootDirFiles[0].path;
+            }
+        } else {
+            // For older export formats, the first item should be the root directory
+            rootDir = files.find(f => f.type === 'directory')?.path || files[0].path;
+        }
+
+        const htmlDir = `${tmpDir}/${rootDir}`;
+        console.debug(`DEBUG: Looking for HTML files in directory: ${htmlDir}`);
+
+        const allFiles = await fs.readdir(htmlDir);
+        console.debug(`DEBUG: Files in directory:`, allFiles);
+
+        const htmlFiles = allFiles.filter(fn => fn.endsWith('.html'));
+        console.debug(`DEBUG: Found HTML files:`, htmlFiles);
+
+        if (htmlFiles.length === 0) {
+            throw new Error(`No HTML files found in flomo export. Directory: ${htmlDir}, Files: ${allFiles.join(', ')}`);
+        }
+
+        // Use the first HTML file found
+        const defaultPage = htmlFiles[0];
+        const dataExport = await this.sanitize(`${htmlDir}/${defaultPage}`);
         const flomo = new FlomoCore(dataExport);
 
         const memos = await this.importMemos(flomo);

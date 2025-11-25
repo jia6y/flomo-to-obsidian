@@ -15,11 +15,13 @@ export class MainUI extends Modal {
 
     plugin: Plugin;
     rawPath: string;
+    rawFile: File | null;
 
     constructor(app: App, plugin: Plugin) {
         super(app);
         this.plugin = plugin;
         this.rawPath = "";
+        this.rawFile = null;
     }
 
     async onSync(btn: ButtonComponent): Promise<void> {
@@ -29,10 +31,16 @@ export class MainUI extends Modal {
                 btn.setDisabled(true);
                 btn.setButtonText("Exporting from Flomo ...");
                 const exportResult = await (new FlomoExporter().export());
-                
+
                 btn.setDisabled(false);
                 if (exportResult[0] == true) {
                     this.rawPath = DOWNLOAD_FILE;
+
+                    // Verify the downloaded file exists before importing
+                    if (!await fs.pathExists(this.rawPath)) {
+                        throw new Error(`Export completed but file not found at ${this.rawPath}. Please check if the export was successful.`);
+                    }
+
                     btn.setButtonText("Importing...");
                     await this.onSubmit();
                     btn.setButtonText("Auto Sync 🤗");
@@ -63,16 +71,53 @@ export class MainUI extends Modal {
 
         try {
             const config = this.plugin.settings;
+
+            // Handle file upload when path is not available (modern Electron/security)
+            if (this.rawFile && (!this.rawPath || this.rawPath === "")) {
+                // Create a temporary file to work with the File object
+                const tempDir = path.join(os.tmpdir(), 'flomo-import');
+                await fs.ensureDir(tempDir);
+                const tempFilePath = path.join(tempDir, this.rawFile.name);
+
+                // Convert File to buffer and save to temp file
+                const arrayBuffer = await this.rawFile.arrayBuffer();
+                const buffer = Buffer.from(arrayBuffer);
+                await fs.writeFile(tempFilePath, buffer);
+
+                config["rawDir"] = tempFilePath;
+                this.rawPath = tempFilePath;
+
+                const flomo = await (new FlomoImporter(this.app, config)).import();
+
+                // Clean up temp file
+                await fs.remove(tempDir);
+                this.rawPath = "";
+                this.rawFile = null;
+
+                new Notice(`🎉 Import Completed.\nTotal: ${flomo.memos.length} memos`)
+                return;
+            }
+
+            // Handle traditional file path approach (older Electron or when path is available)
+            if (!this.rawPath) {
+                throw new Error("No file selected. Please select a flomo export file (.zip) before importing.");
+            }
+
             config["rawDir"] = this.rawPath;
+
+            if (!await fs.pathExists(this.rawPath)) {
+                throw new Error(`Input file not found at path: ${this.rawPath}. Please ensure the file exists and try again.`);
+            }
 
             const flomo = await (new FlomoImporter(this.app, config)).import();
 
             new Notice(`🎉 Import Completed.\nTotal: ${flomo.memos.length} memos`)
             this.rawPath = "";
-
+            this.rawFile = null;
 
         } catch (err) {
             this.rawPath = "";
+            this.rawFile = null;
             console.log(err);
             new Notice(`Flomo Importer Error. Details:\n${err}`);
         }
@@ -88,8 +133,20 @@ export class MainUI extends Modal {
         const fileLocContol: HTMLInputElement = contentEl.createEl("input", { type: "file", cls: "uploadbox" })
         fileLocContol.setAttr("accept", ".zip");
         fileLocContol.onchange = (ev) => {
-            this.rawPath = ev.currentTarget.files[0]["path"];
-            console.log(this.rawPath)
+            const file = ev.currentTarget.files[0];
+            if (file) {
+                this.rawFile = file;
+
+                // Try to get the path if available (for older Electron versions)
+                if ((file as any).path) {
+                    this.rawPath = (file as any).path;
+                } else {
+                    this.rawPath = ""; // Will be handled differently
+                }
+            } else {
+                this.rawFile = null;
+                this.rawPath = "";
+            }
         };
 
         contentEl.createEl("br");
@@ -212,15 +269,19 @@ export class MainUI extends Modal {
                 btn.setButtonText("Import")
                     .setCta()
                     .onClick(async () => {
-                        if (this.rawPath != "") {
+                        if (!this.rawFile && (!this.rawPath || this.rawPath === "")) {
+                            new Notice("Please select a flomo export file (.zip) before importing.");
+                            return;
+                        }
+
+                        try {
                             await this.plugin.saveSettings();
                             await this.onSubmit();
                             //const manualSyncUI: Modal = new ManualSyncUI(this.app, this.plugin);
                             //manualSyncUI.open();
                             this.close();
-                        }
-                        else {
-                            new Notice("No File Selected.")
+                        } catch (err) {
+                            // Error is already handled in onSubmit()
                         }
                     })
             })
@@ -238,6 +299,7 @@ export class MainUI extends Modal {
 
     onClose() {
         this.rawPath = "";
+        this.rawFile = null;
         const { contentEl } = this;
         contentEl.empty();
     }
