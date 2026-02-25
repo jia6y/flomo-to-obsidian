@@ -9,7 +9,8 @@ interface MyPluginSettings {
 	optionsCanvas: string,
 	expOptionAllowbilink: boolean,
 	canvasSize: string,
-	mergeByDate: boolean
+	mergeByDate: boolean,
+	manualDailyMergeTargetDir: string
 }
 
 const DEFAULT_SETTINGS: MyPluginSettings = {
@@ -19,7 +20,8 @@ const DEFAULT_SETTINGS: MyPluginSettings = {
 	optionsCanvas: "copy_with_content",
 	expOptionAllowbilink: true,
 	canvasSize: 'M',
-	mergeByDate: false
+	mergeByDate: false,
+	manualDailyMergeTargetDir: "/Users/maxfeng/Documents/Obsidian/Max's Original Vault/Inbox/Flomo"
 }
 
 export default class FlomoImporterPlugin extends Plugin {

@@ -5,11 +5,13 @@ import { createExpOpt } from './common';
 export class ManualSyncUI extends Modal {
     plugin: Plugin;
     rawPath: string;
+    selectedFile: File | null;
 
     constructor(app: App, plugin: Plugin) {
         super(app);
         this.plugin = plugin;
         this.rawPath = "";
+        this.selectedFile = null;
     }
 
     onOpen() {
@@ -23,8 +25,14 @@ export class ManualSyncUI extends Modal {
         const fileLocContol: HTMLInputElement = contentEl.createEl("input", { type: "file", cls: "uploadbox" })
         fileLocContol.setAttr("accept", ".zip");
         fileLocContol.onchange = (ev) => {
-            this.rawPath = ev.currentTarget.files[0]["path"];
-            console.log(this.rawPath)
+            const selectedFile = ev.currentTarget?.files?.[0] ?? null;
+            this.selectedFile = selectedFile;
+            this.rawPath = "";
+            if (selectedFile == null) {
+                console.log("[ManualSyncUI] 文件选择结果: <empty>");
+                return;
+            }
+            console.log(`[ManualSyncUI] 文件选择结果: ${selectedFile.name} (${selectedFile.size} bytes)`);
         };
 
         contentEl.createEl("br");
