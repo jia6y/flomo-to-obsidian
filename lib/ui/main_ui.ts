@@ -15,11 +15,13 @@ export class MainUI extends Modal {
 
     plugin: Plugin;
     rawPath: string;
+    selectedFile: File | null;
 
     constructor(app: App, plugin: Plugin) {
         super(app);
         this.plugin = plugin;
         this.rawPath = "";
+        this.selectedFile = null;
     }
 
     async onSync(btn: ButtonComponent): Promise<void> {
@@ -33,6 +35,7 @@ export class MainUI extends Modal {
                 btn.setDisabled(false);
                 if (exportResult[0] == true) {
                     this.rawPath = DOWNLOAD_FILE;
+                    this.selectedFile = null;
                     btn.setButtonText("Importing...");
                     await this.onSubmit();
                     btn.setButtonText("Auto Sync 🤗");
@@ -64,15 +67,41 @@ export class MainUI extends Modal {
         try {
             const config = this.plugin.settings;
             config["rawDir"] = this.rawPath;
+            const importer = new FlomoImporter(this.app, config);
+            const flomo = await (async () => {
+                if (this.selectedFile != null) {
+                    const lowerFileName = this.selectedFile.name.toLowerCase();
+                    console.log(`[MainUI] 手工导入分支，文件: ${this.selectedFile.name}, size: ${this.selectedFile.size}`);
+                    if (lowerFileName.endsWith(".html")) {
+                        const htmlText = await this.selectedFile.text();
+                        return importer.importFromContent({
+                            fileName: this.selectedFile.name,
+                            htmlText: htmlText
+                        });
+                    }
 
-            const flomo = await (new FlomoImporter(this.app, config)).import();
+                    if (lowerFileName.endsWith(".zip")) {
+                        const zipBytes = Buffer.from(await this.selectedFile.arrayBuffer());
+                        return importer.importFromContent({
+                            fileName: this.selectedFile.name,
+                            zipBytes: zipBytes
+                        });
+                    }
+
+                    throw new Error("仅支持 .zip 或 .html 文件。");
+                }
+
+                return importer.import();
+            })();
 
             new Notice(`🎉 Import Completed.\nTotal: ${flomo.memos.length} memos`)
             this.rawPath = "";
+            this.selectedFile = null;
 
 
         } catch (err) {
             this.rawPath = "";
+            this.selectedFile = null;
             console.log(err);
             new Notice(`Flomo Importer Error. Details:\n${err}`);
         }
@@ -86,10 +115,16 @@ export class MainUI extends Modal {
         contentEl.createEl("h3", { text: "Flomo Importer" });
 
         const fileLocContol: HTMLInputElement = contentEl.createEl("input", { type: "file", cls: "uploadbox" })
-        fileLocContol.setAttr("accept", ".zip");
+        fileLocContol.setAttr("accept", ".zip,.html");
         fileLocContol.onchange = (ev) => {
-            this.rawPath = ev.currentTarget.files[0]["path"];
-            console.log(this.rawPath)
+            const selectedFile = ev.currentTarget?.files?.[0] ?? null;
+            this.selectedFile = selectedFile;
+            this.rawPath = "";
+            if (selectedFile == null) {
+                console.log("[MainUI] 文件选择结果: <empty>");
+                return;
+            }
+            console.log(`[MainUI] 文件选择结果: ${selectedFile.name} (${selectedFile.size} bytes)`);
         };
 
         contentEl.createEl("br");
@@ -112,6 +147,16 @@ export class MainUI extends Modal {
                 .setValue(this.plugin.settings.memoTarget)
                 .onChange(async (value) => {
                     this.plugin.settings.memoTarget = value;
+                }));
+
+        new Setting(contentEl)
+            .setName('Manual Daily Merge Dir')
+            .setDesc('手工导出 HTML 按天合并的目标目录（支持绝对路径）')
+            .addText((text) => text
+                .setPlaceholder("/Users/maxfeng/Documents/Obsidian/Max's Original Vault/Inbox/Flomo")
+                .setValue(this.plugin.settings.manualDailyMergeTargetDir)
+                .onChange(async (value) => {
+                    this.plugin.settings.manualDailyMergeTargetDir = value.trim();
                 }));
 
         new Setting(contentEl)
@@ -212,16 +257,37 @@ export class MainUI extends Modal {
                 btn.setButtonText("Import")
                     .setCta()
                     .onClick(async () => {
-                        if (this.rawPath != "") {
-                            await this.plugin.saveSettings();
-                            await this.onSubmit();
-                            //const manualSyncUI: Modal = new ManualSyncUI(this.app, this.plugin);
-                            //manualSyncUI.open();
-                            this.close();
+                        const selectedFile = this.selectedFile;
+                        if (selectedFile == null) {
+                            const normalizedRawPath = typeof this.rawPath === "string" ? this.rawPath.trim() : "";
+                            console.log(`[MainUI] 点击导入，rawPath: ${normalizedRawPath || "<empty>"}`);
+                        } else {
+                            console.log(`[MainUI] 点击导入，文件: ${selectedFile.name}`);
                         }
-                        else {
+
+                        if (selectedFile == null && this.rawPath.trim() === "") {
                             new Notice("No File Selected.")
+                            return;
                         }
+
+                        const lowerRawPath = selectedFile == null ? this.rawPath.trim().toLowerCase() : selectedFile.name.toLowerCase();
+                        const isSupported = lowerRawPath.endsWith(".zip") || lowerRawPath.endsWith(".html");
+                        console.log(`[MainUI] 导入文件后缀校验: ${isSupported ? "passed" : "failed"}`);
+                        if (!isSupported) {
+                            new Notice("仅支持 .zip 或 .html 文件。");
+                            return;
+                        }
+
+                        if (selectedFile == null) {
+                            this.rawPath = this.rawPath.trim();
+                        } else {
+                            this.rawPath = "";
+                        }
+                        await this.plugin.saveSettings();
+                        await this.onSubmit();
+                        //const manualSyncUI: Modal = new ManualSyncUI(this.app, this.plugin);
+                        //manualSyncUI.open();
+                        this.close();
                     })
             })
             .addButton((btn) => {
@@ -238,6 +304,7 @@ export class MainUI extends Modal {
 
     onClose() {
         this.rawPath = "";
+        this.selectedFile = null;
         const { contentEl } = this;
         contentEl.empty();
     }

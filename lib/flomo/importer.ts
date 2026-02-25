@@ -24,10 +24,23 @@ export class FlomoImporter {
         this.config["baseDir"] = app.vault.adapter.basePath;
     }
 
-    private async sanitize(path: string): Promise<string> {
-        const flomoData = await fs.readFile(path, "utf8");
+    private sanitizeHtml(flomoData: string): string {
         const document = parse5.parse(flomoData);
         return parse5.serialize(document);
+    }
+
+    private async sanitizePath(rawPath: string): Promise<string> {
+        const flomoData = await fs.readFile(rawPath, "utf8");
+        return this.sanitizeHtml(flomoData);
+    }
+
+    private resolveManualTargetDir(): { targetDir: string, isAbsoluteTarget: boolean } {
+        const configured = this.config["manualDailyMergeTargetDir"] || `${this.config["flomoTarget"]}/${this.config["memoTarget"]}`;
+        const expandedTarget = configured.replace(/^~(?=\/|$)/, os.homedir());
+        return {
+            targetDir: expandedTarget,
+            isAbsoluteTarget: path.isAbsolute(expandedTarget)
+        };
     }
 
     private async importMemos(flomo: FlomoCore): Promise<FlomoCore> {
@@ -72,54 +85,140 @@ export class FlomoImporter {
         return flomo;
     }
 
-    async import(): Promise<FlomoCore> {
+    private async importHtmlMemosByDate(flomo: FlomoCore): Promise<FlomoCore> {
+        const { targetDir, isAbsoluteTarget } = this.resolveManualTargetDir();
+        const mergedCountByDate: Record<string, number> = {};
 
-        // 1. Create workspace
-        const tmpDir = path.join(FLOMO_CACHE_LOC, "data")
-        await fs.mkdirp(tmpDir);
+        if (isAbsoluteTarget) {
+            await fs.mkdirp(targetDir);
+        } else {
+            await fs.mkdirp(path.join(this.config["baseDir"], targetDir));
+        }
 
-        // 2. Unzip flomo_backup.zip to workspace
-        const files = await decompress(this.config["rawDir"], tmpDir)
+        for (const memo of flomo.memos) {
+            const date = memo["date"];
+            const content = memo["content"].replaceAll("FLOMOIMPORTERHIGHLIGHTMARKPLACEHOLDER", "==");
+            const filePath = isAbsoluteTarget ? path.join(targetDir, `${date}.md`) : `${targetDir}/${date}.md`;
 
-        // 3. copy attachments to ObVault
-        const obVaultConfig = await fs.readJson(`${this.config["baseDir"]}/${this.app.vault.configDir}/app.json`)
-        const attachementDir = obVaultConfig["attachmentFolderPath"] + "/flomo/";
-
-        for (const f of files) {
-            if (f.type == "directory" && f.path.endsWith("/file/")) {
-                console.debug(`DEBUG: copying from ${tmpDir}/${f.path} to ${this.config["baseDir"]}/${attachementDir}`)
-                await fs.copy(`${tmpDir}/${f.path}`, `${this.config["baseDir"]}/${attachementDir}`);
-                break
+            let existing = "";
+            if (isAbsoluteTarget) {
+                if (await fs.pathExists(filePath)) {
+                    existing = await fs.readFile(filePath, "utf8");
+                }
+            } else if (await this.app.vault.adapter.exists(filePath)) {
+                existing = await this.app.vault.adapter.read(filePath);
             }
 
+            if (existing.includes(content)) {
+                continue;
+            }
+
+            const merged = existing.trim().length > 0 ? `${existing}\n\n---\n\n${content}` : content;
+            if (isAbsoluteTarget) {
+                await fs.writeFile(filePath, merged, "utf8");
+            } else {
+                await this.app.vault.adapter.write(filePath, merged);
+            }
+
+            mergedCountByDate[date] = (mergedCountByDate[date] || 0) + 1;
         }
 
-        // 4. Import Memos
-        // @Mar-31, 2024 Fix: #21 - Update default page from index.html to <userid>.html
-        const defaultPage = (await fs.readdir(`${tmpDir}/${files[0].path}`)).filter((fn, _idx, fn_array) => fn.endsWith('.html'))[0];
-        const dataExport = await this.sanitize(`${tmpDir}/${files[0].path}/${defaultPage}`);
-        const flomo = new FlomoCore(dataExport);
+        console.log(`[FlomoImporter] 手工 HTML 按天合并完成，目标目录: ${targetDir}，涉及 ${Object.keys(mergedCountByDate).length} 天`);
+        return flomo;
+    }
 
-        const memos = await this.importMemos(flomo);
+    private async importZipWorkspace(rawZip: string | Buffer): Promise<FlomoCore> {
+        const tmpDir = path.join(FLOMO_CACHE_LOC, "data");
+        await fs.mkdirp(tmpDir);
 
-        // 5. Ob Intergations
-        // If Generate Moments
-        if (this.config["optionsMoments"] != "skip") {
-            await generateMoments(app, memos, this.config);
+        try {
+            const files = await decompress(rawZip, tmpDir);
+            if (files.length === 0) {
+                throw new Error("ZIP 文件内容为空或无法解析，请重新导出后重试。");
+            }
+
+            const rootDir = files.find((f) => f.type === "directory");
+            if (rootDir == null) {
+                throw new Error("ZIP 结构不符合预期，缺少根目录。");
+            }
+
+            const rootPath = `${tmpDir}/${rootDir.path}`;
+            const htmlFiles = (await fs.readdir(rootPath)).filter((fn) => fn.toLowerCase().endsWith('.html'));
+            const defaultPage = htmlFiles[0];
+            if (defaultPage == null) {
+                throw new Error("ZIP 中未找到可导入的 HTML 文件。");
+            }
+
+            const obVaultConfig = await fs.readJson(`${this.config["baseDir"]}/${this.app.vault.configDir}/app.json`);
+            const attachmentRoot = obVaultConfig["attachmentFolderPath"] || "attachments";
+            const attachementDir = `${attachmentRoot}/flomo/`;
+
+            for (const f of files) {
+                if (f.type == "directory" && f.path.endsWith("/file/")) {
+                    console.debug(`DEBUG: copying from ${tmpDir}/${f.path} to ${this.config["baseDir"]}/${attachementDir}`);
+                    await fs.copy(`${tmpDir}/${f.path}`, `${this.config["baseDir"]}/${attachementDir}`);
+                    break;
+                }
+            }
+
+            const dataExport = await this.sanitizePath(`${rootPath}/${defaultPage}`);
+            const flomo = new FlomoCore(dataExport);
+            const memos = await this.importMemos(flomo);
+
+            if (this.config["optionsMoments"] != "skip") {
+                await generateMoments(this.app, memos, this.config);
+            }
+
+            if (this.config["optionsCanvas"] != "skip") {
+                await generateCanvas(this.app, memos, this.config);
+            }
+
+            return flomo;
+        } finally {
+            await fs.remove(tmpDir);
+        }
+    }
+
+    async importFromContent(payload: { fileName: string, htmlText?: string, zipBytes?: Buffer }): Promise<FlomoCore> {
+        const lowerFileName = payload.fileName.toLowerCase();
+        console.log(`[FlomoImporter] 内容导入入口: ${payload.fileName}`);
+
+        if (lowerFileName.endsWith(".html")) {
+            if (typeof payload.htmlText !== "string" || payload.htmlText.trim() === "") {
+                throw new Error("HTML 文件读取失败，内容为空。");
+            }
+            const sanitized = this.sanitizeHtml(payload.htmlText);
+            const flomo = new FlomoCore(sanitized);
+            return this.importHtmlMemosByDate(flomo);
         }
 
-
-        // If Generate Canvas
-        if (this.config["optionsCanvas"] != "skip") {
-            await generateCanvas(app, memos, this.config);
+        if (lowerFileName.endsWith(".zip")) {
+            if (payload.zipBytes == null || payload.zipBytes.length === 0) {
+                throw new Error("ZIP 文件读取失败，内容为空。");
+            }
+            return this.importZipWorkspace(payload.zipBytes);
         }
 
+        throw new Error("仅支持 .zip 或 .html 文件。");
+    }
 
-        // 6. Cleanup Workspace
-        await fs.remove(tmpDir);
+    async import(): Promise<FlomoCore> {
+        const rawPath: string = this.config["rawDir"];
+        const normalizedRawPath = typeof rawPath === "string" ? rawPath.trim() : "";
+        if (normalizedRawPath === "") {
+            console.log("[FlomoImporter] 导入入口参数异常: rawDir 为空");
+            throw new Error("未选择导入文件路径，请先选择 .zip 或 .html 文件。");
+        }
 
-        return flomo
-
+        console.log(`[FlomoImporter] 导入入口 rawPath: ${normalizedRawPath}`);
+        if (normalizedRawPath.toLowerCase().endsWith(".html")) {
+            console.log(`[FlomoImporter] 检测到手工导出 HTML: ${normalizedRawPath}`);
+            const dataExport = await this.sanitizePath(normalizedRawPath);
+            const flomo = new FlomoCore(dataExport);
+            return this.importHtmlMemosByDate(flomo);
+        }
+        console.log("[FlomoImporter] 检测到 ZIP 导入分支");
+        return this.importZipWorkspace(normalizedRawPath);
     }
 
 }
